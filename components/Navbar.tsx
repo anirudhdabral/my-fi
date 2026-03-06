@@ -5,23 +5,20 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Button,
   Box,
+  Chip,
   Container,
   Stack,
-  useTheme,
   alpha,
   Avatar,
   Menu,
   MenuItem,
-  Tooltip,
   Divider,
   ListItemIcon,
   IconButton,
 } from "@mui/material";
 import {
   Logout as LogoutIcon,
-  PersonOutline as PersonIcon,
   ColorLens as ThemeIcon,
   Settings as AdminIcon,
 } from "@mui/icons-material";
@@ -33,7 +30,6 @@ import { useToast } from "@/lib/toast";
 export default function Navbar() {
   const { showToast } = useToast();
   const { data: session } = useSession();
-  const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -60,35 +56,39 @@ export default function Navbar() {
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
-      <Container maxWidth="lg">
-        <Toolbar disableGutters sx={{ height: 72 }}>
-          <Typography
-            variant="h6"
-            component={Link}
-            href="/"
-            sx={{
-              fontWeight: 700,
-              textDecoration: "none",
-              color: "primary.main",
-              flexGrow: { xs: 1, md: 0 },
-              mr: { md: 4 },
-              letterSpacing: "-0.5px",
-            }}
-          >
-            MyFi Portal
-          </Typography>
-
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}
-          >
-            {/* Nav items if any */}
-          </Stack>
-
-          <Box sx={{ flexGrow: 0 }}>
+      <Container>
+        <Toolbar
+          disableGutters
+          sx={{
+            height: 72,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Link href="/" style={{ textDecoration: "none" }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                textDecoration: "none",
+                color: "primary.main",
+                letterSpacing: "-0.5px",
+                cursor: "pointer",
+                flexGrow: { xs: 1, md: 0 },
+                mr: { md: 4 },
+              }}
+            >
+              MyFi Portal
+            </Typography>
+          </Link>
+          <Box>
             <Stack direction="row" spacing={1} alignItems="center">
-              {!session && <ThemeToggle />}
+              {!session && (
+                <>
+                  <ThemeToggle />
+                </>
+              )}
               {session && (
                 <>
                   <IconButton
@@ -115,22 +115,26 @@ export default function Navbar() {
                     id="account-menu"
                     open={Boolean(anchorEl)}
                     onClose={handleCloseUserMenu}
-                    onClick={handleCloseUserMenu}
                     PaperProps={{
                       elevation: 0,
                       sx: {
-                        mt: 1,
-                        borderRadius: 4,
-                        minWidth: 220,
+                        mt: 1.25,
+                        borderRadius: 5,
+                        minWidth: 280,
                         border: "1px solid",
                         borderColor: "divider",
+                        overflow: "hidden",
+                        background: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? "linear-gradient(160deg, #111622 0%, #0b1019 100%)"
+                            : "linear-gradient(160deg, #ffffff 0%, #f8fbff 100%)",
                         boxShadow: (theme) =>
                           theme.palette.mode === "dark"
-                            ? "0 8px 32px rgba(0,0,0,0.4)"
-                            : "0 8px 32px rgba(0,0,0,0.08)",
+                            ? "0 16px 40px rgba(0,0,0,0.45)"
+                            : "0 14px 32px rgba(15,23,42,0.12)",
                         "& .MuiMenuItem-root": {
-                          px: 2,
-                          py: 1,
+                          px: 1.25,
+                          py: 0.5,
                           fontSize: "0.875rem",
                         },
                       },
@@ -140,24 +144,23 @@ export default function Navbar() {
                   >
                     <Box
                       sx={{
-                        px: 2,
-                        py: 1.5,
+                        p: 2,
                         display: "flex",
-                        alignItems: "center",
-                        gap: 1.5,
+                        gap: 1.75,
+                        alignItems: "flex-start",
                       }}
                     >
                       <Avatar
                         src={session.user?.image || ""}
                         sx={{
-                          width: 40,
-                          height: 40,
+                          width: 44,
+                          height: 44,
                           border: "1px solid",
                           borderColor: "divider",
                         }}
                       />
-                      <Box sx={{ overflow: "hidden" }}>
-                        <Typography variant="body2" fontWeight={700} noWrap>
+                      <Box sx={{ overflow: "hidden", minWidth: 0 }}>
+                        <Typography variant="subtitle2" fontWeight={800} noWrap>
                           {session.user?.name}
                         </Typography>
                         <Typography
@@ -168,43 +171,64 @@ export default function Navbar() {
                         >
                           {session.user?.email}
                         </Typography>
+                        <Chip
+                          size="small"
+                          label={
+                            session.user?.role === "admin" ? "Admin" : "User"
+                          }
+                          color={
+                            session.user?.role === "admin"
+                              ? "primary"
+                              : "default"
+                          }
+                          sx={{ mt: 1, height: 22, fontWeight: 700 }}
+                        />
                       </Box>
                     </Box>
 
-                    <Divider sx={{ my: 0.5, opacity: 0.6 }} />
+                    <Divider sx={{ opacity: 0.6 }} />
 
-                    <Box sx={{ px: 2, py: 0.5 }}>
+                    <Box sx={{ p: 1 }}>
                       {session?.user?.role === "admin" && (
-                        <>
-                          <MenuItem
-                            component={Link}
-                            href="/admin"
-                            onClick={handleCloseUserMenu}
-                            sx={{
-                              borderRadius: 4,
-                              "&:hover": {
-                                bgcolor: (theme) =>
-                                  alpha(theme.palette.primary.main, 0.08),
-                                color: "primary.main",
-                              },
-                            }}
-                          >
-                            <ListItemIcon>
-                              <AdminIcon
-                                fontSize="small"
-                                sx={{ color: "inherit" }}
-                              />
-                            </ListItemIcon>
-                            Admin
-                          </MenuItem>
-                          <Divider sx={{ mx: 2, my: 0.5, opacity: 0.1 }} />
-                        </>
+                        <MenuItem
+                          component={Link}
+                          href="/admin"
+                          onClick={handleCloseUserMenu}
+                          sx={{
+                            borderRadius: 3,
+                            py: 1,
+                            "&:hover": {
+                              bgcolor: (theme) =>
+                                alpha(theme.palette.primary.main, 0.1),
+                              color: "primary.main",
+                            },
+                          }}
+                        >
+                          <ListItemIcon>
+                            <AdminIcon
+                              fontSize="small"
+                              sx={{ color: "inherit" }}
+                            />
+                          </ListItemIcon>
+                          <Box>
+                            <Typography variant="body2" fontWeight={700}>
+                              Admin Console
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              Manage users and configuration
+                            </Typography>
+                          </Box>
+                        </MenuItem>
                       )}
 
                       <MenuItem
                         sx={{
                           cursor: "default",
-                          borderRadius: 4,
+                          borderRadius: 3,
+                          py: 1,
                           "&:hover": { bgcolor: "transparent !important" },
                         }}
                       >
@@ -212,24 +236,29 @@ export default function Navbar() {
                           <ThemeIcon fontSize="small" />
                         </ListItemIcon>
                         <Box sx={{ flexGrow: 1 }}>
-                          <Typography variant="body2" fontWeight={500}>
+                          <Typography variant="body2" fontWeight={700}>
                             Appearance
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Switch between light and dark mode
                           </Typography>
                         </Box>
                         <ThemeToggle />
                       </MenuItem>
 
-                      <Divider sx={{ mx: 2, my: 0.5, opacity: 0.1 }} />
+                      <Divider sx={{ my: 0.75, opacity: 0.2 }} />
 
                       <MenuItem
                         onClick={async () => {
+                          handleCloseUserMenu();
                           showToast("Signed out successfully", "success");
                           await signOut({ callbackUrl: "/" });
                         }}
                         sx={{
                           color: "error.main",
-                          fontWeight: 600,
-                          borderRadius: 4,
+                          fontWeight: 700,
+                          borderRadius: 3,
+                          py: 1,
                           "&:hover": {
                             bgcolor: (theme) =>
                               alpha(theme.palette.error.main, 0.08),
@@ -242,7 +271,14 @@ export default function Navbar() {
                             sx={{ color: "inherit" }}
                           />
                         </ListItemIcon>
-                        Sign Out
+                        <Box>
+                          <Typography variant="body2" fontWeight={700}>
+                            Sign Out
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            End current session
+                          </Typography>
+                        </Box>
                       </MenuItem>
                     </Box>
                   </Menu>

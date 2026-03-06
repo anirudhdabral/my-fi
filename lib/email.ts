@@ -35,11 +35,11 @@ export async function sendRebalanceEmail(
 export async function sendUserApprovalEmail(recipient: string) {
   const html = `
     <h1>Access Granted</h1>
-    <p>Welcome! Your access to the MyFi Portfolio portal has been approved.</p>
+    <p>Welcome! Your access to the MyFi portal has been approved.</p>
     <p>You can now log in and manage your investment allocations.</p>
     <a href="${process.env.NEXTAUTH_URL}">Go to Dashboard</a>
   `;
-  const text = `Access Granted. Your access to the MyFi Portfolio portal has been approved. You can now log in and manage your investment allocations at ${process.env.NEXTAUTH_URL}`;
+  const text = `Access Granted. Your access to the MyFi portal has been approved. You can now log in and manage your investment allocations at ${process.env.NEXTAUTH_URL}`;
 
   await transport.sendMail({
     from: ADMIN_EMAIL,
@@ -50,20 +50,3 @@ export async function sendUserApprovalEmail(recipient: string) {
   });
 }
 
-export async function sendUserRevokeEmail(recipient: string) {
-  const html = `
-    <h1>Access Revoked</h1>
-    <p>Your access to the MyFi Portfolio portal has been revoked.</p>
-    <p>If you believe this is an error, please contact the administrator.</p>
-  `;
-  const text =
-    "Access Revoked. Your access to the MyFi Portfolio portal has been revoked. If you believe this is an error, please contact the administrator.";
-
-  await transport.sendMail({
-    from: ADMIN_EMAIL,
-    to: recipient,
-    subject: "MyFi Portal: Access Revoked",
-    text,
-    html,
-  });
-}

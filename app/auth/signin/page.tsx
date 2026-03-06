@@ -1,16 +1,18 @@
 "use client";
 
-import { Button, Box, Container, Typography } from "@mui/material";
+import { Button, Container, Paper, Stack } from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import GoogleIcon from "@mui/icons-material/Google";
 
 import { useToast } from "@/lib/toast";
 
 export default function SignInPage() {
   const { showToast } = useToast();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
@@ -22,53 +24,75 @@ export default function SignInPage() {
   if (status === "loading" || status === "authenticated") {
     return null;
   }
+
   return (
     <Container
       maxWidth="sm"
       sx={{
-        minHeight: "80vh",
+        minHeight: "calc(100vh - 72px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
       >
-        <Box
+        <Paper
           sx={{
-            borderRadius: 4,
-            boxShadow: (theme) =>
+            p: 2,
+            borderRadius: 5,
+            background: (theme) =>
               theme.palette.mode === "dark"
-                ? "0 8px 32px rgba(0,0,0,0.4)"
-                : "0 8px 32px rgba(0,0,0,0.08)",
-            p: 5,
-            textAlign: "center",
-            bgcolor: "background.paper",
+                ? "linear-gradient(160deg, rgba(17,22,34,0.9), rgba(11,16,25,0.9))"
+                : "linear-gradient(160deg, rgba(255,255,255,0.92), rgba(248,251,255,0.92))",
+            backdropFilter: "blur(10px)",
             border: "1px solid",
             borderColor: "divider",
+            width: { xs: 300, sm: 340 },
           }}
         >
-          <Typography variant="h4" fontWeight={700} mb={1}>
-            Sign In
-          </Typography>
-          <Typography color="text.secondary" mb={4}>
-            Welcome back to MyFi Portal
-          </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={() => {
-              showToast("Redirecting to Google...", "info");
-              signIn("google", { callbackUrl: "/" });
-            }}
-            sx={{ borderRadius: 5, px: 4 }}
-          >
-            Continue with Google
-          </Button>
-        </Box>
+          <Stack spacing={1.5} sx={{ mx: "auto" }}>
+            <Button
+              variant="outlined"
+              size="large"
+              startIcon={<ArrowBackIcon />}
+              onClick={() => router.push("/")}
+              sx={{
+                borderRadius: 999,
+                py: 1.2,
+                fontWeight: 700,
+                borderWidth: 1.5,
+                "&:hover": { borderWidth: 1.5, transform: "translateY(-1px)" },
+              }}
+            >
+              Back
+            </Button>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<GoogleIcon />}
+              onClick={() => {
+                showToast("Redirecting to Google...", "info");
+                signIn("google", { callbackUrl: "/" });
+              }}
+              sx={{
+                borderRadius: 999,
+                py: 1.2,
+                fontWeight: 800,
+                boxShadow: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "0 10px 24px rgba(99,102,241,0.35)"
+                    : "0 10px 24px rgba(79,70,229,0.28)",
+                "&:hover": { transform: "translateY(-1px)" },
+              }}
+            >
+              Sign in with Google
+            </Button>
+          </Stack>
+        </Paper>
       </motion.div>
     </Container>
   );

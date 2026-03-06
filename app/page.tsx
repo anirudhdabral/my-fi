@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import {
   Box,
   Button,
@@ -8,11 +8,16 @@ import {
   Paper,
   Stack,
   Typography,
-  Chip,
   Skeleton,
+  Chip,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { motion } from "framer-motion";
+import {
+  ShieldRounded as ShieldIcon,
+  AutoGraphRounded as InsightsIcon,
+  BalanceRounded as RebalanceIcon,
+} from "@mui/icons-material";
 import InvestmentCalculator from "@/components/InvestmentCalculator";
 
 export default function HomePage() {
@@ -104,10 +109,24 @@ export default function HomePage() {
             spacing={3}
             sx={{ position: "relative", zIndex: 1, maxWidth: 700 }}
           >
+            <Chip
+              label="Institution-grade allocation workspace"
+              color="primary"
+              size="small"
+              sx={{
+                width: "fit-content",
+                fontWeight: 700,
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "rgba(129,140,248,0.2)"
+                    : "rgba(99,102,241,0.12)",
+              }}
+            />
             <Typography
               variant="h2"
               sx={{
-                fontSize: { xs: "2.5rem", md: "3.5rem" },
+                fontSize: { xs: "2.2rem", md: "3.4rem" },
+                lineHeight: 1.1,
                 background: (theme) =>
                   theme.palette.mode === "dark"
                     ? "linear-gradient(to bottom right, #fff, #94a3b8)"
@@ -127,9 +146,90 @@ export default function HomePage() {
               scale your wealth with data-driven insights and automated
               rebalancing.
             </Typography>
+            {!session && (
+              <Stack direction="row" spacing={1.25} sx={{ pt: 1 }}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={() => signIn()}
+                  sx={{ borderRadius: 999, px: 4, py: 1.25, fontWeight: 700 }}
+                >
+                  Sign In
+                </Button>
+              </Stack>
+            )}
           </Stack>
         </Paper>
       </motion.div>
+
+      {!session && (
+        <Grid
+          id="platform-highlights"
+          container
+          spacing={3}
+          sx={{ mb: { xs: 5, md: 7 } }}
+        >
+          {[
+            {
+              title: "Secure Access Controls",
+              description:
+                "Approval-based access and role boundaries keep portfolio operations tightly governed.",
+              icon: <ShieldIcon fontSize="small" />,
+            },
+            {
+              title: "Data-Driven Insights",
+              description:
+                "Allocation decisions are backed by structured inputs and repeatable calculation flows.",
+              icon: <InsightsIcon fontSize="small" />,
+            },
+            {
+              title: "Rebalance Ready",
+              description:
+                "Detect gaps, align targets, and move from intent to rebalancing with confidence.",
+              icon: <RebalanceIcon fontSize="small" />,
+            },
+          ].map((item) => (
+            <Grid key={item.title} size={{ xs: 12, md: 4 }}>
+              <Paper
+                sx={{
+                  p: 3,
+                  height: "100%",
+                  borderRadius: 4,
+                  background: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "linear-gradient(160deg, #151923 0%, #0f131d 100%)"
+                      : "linear-gradient(160deg, #ffffff 0%, #f8fbff 100%)",
+                }}
+              >
+                <Stack spacing={1.5}>
+                  <Box
+                    sx={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 2,
+                      display: "grid",
+                      placeItems: "center",
+                      bgcolor: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? "rgba(129,140,248,0.16)"
+                          : "rgba(99,102,241,0.1)",
+                      color: "primary.main",
+                    }}
+                  >
+                    {item.icon}
+                  </Box>
+                  <Typography variant="subtitle1" fontWeight={700}>
+                    {item.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {item.description}
+                  </Typography>
+                </Stack>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+      )}
 
       <Box sx={{ mb: 8 }}>
         {session &&

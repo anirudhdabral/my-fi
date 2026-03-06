@@ -23,7 +23,7 @@ export async function GET(req: Request) {
   }
 }
 
-import { sendUserApprovalEmail, sendUserRevokeEmail } from "@/lib/email";
+import { sendUserApprovalEmail } from "@/lib/email";
 
 export async function PATCH(req: Request) {
   try {
@@ -45,8 +45,6 @@ export async function PATCH(req: Request) {
     if (approved !== undefined) {
       if (approved) {
         await sendUserApprovalEmail(updated.email);
-      } else {
-        await sendUserRevokeEmail(updated.email);
       }
     }
 

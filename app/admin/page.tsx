@@ -792,7 +792,7 @@ export default function AdminPage() {
               >
                 <Box>
                   <Typography variant="h5" fontWeight={700}>
-                    User Stewardship
+                    Users
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Review join requests and manage messaging.
