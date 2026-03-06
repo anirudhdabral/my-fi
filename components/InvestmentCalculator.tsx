@@ -12,6 +12,7 @@ import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";
 import ListItemText from "@mui/material/ListItemText";
@@ -20,6 +21,7 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import Paper from "@mui/material/Paper";
 import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
+import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
@@ -57,6 +59,106 @@ type Allocation = {
   allocatedAmount: number;
 };
 
+type AllocationResult = Allocation & {
+  categoryName: string;
+  instrumentType: string;
+};
+
+const ROUND_OFF_QUANTUM = 100;
+
+function roundAllocationsPreservingTotal(
+  allocations: AllocationResult[],
+  targetTotal: number,
+) {
+  if (!allocations.length || targetTotal <= 0) {
+    return allocations;
+  }
+
+  const sourceTotal = allocations.reduce(
+    (sum, item) => sum + item.allocatedAmount,
+    0,
+  );
+
+  if (sourceTotal <= 0) {
+    return allocations;
+  }
+
+  const scale = targetTotal / sourceTotal;
+  const quantumCents = ROUND_OFF_QUANTUM * 100;
+  const targetCents = Math.round(targetTotal * 100);
+
+  const staged = allocations.map((allocation, index) => {
+    const exactCents = Math.max(
+      0,
+      Math.round(allocation.allocatedAmount * scale * 100),
+    );
+    const roundedCents =
+      Math.floor(exactCents / quantumCents) * quantumCents;
+
+    return {
+      index,
+      exactCents,
+      roundedCents,
+      remainder: exactCents - roundedCents,
+    };
+  });
+
+  let remainingCents =
+    targetCents -
+    staged.reduce((sum, item) => sum + item.roundedCents, 0);
+
+  const byRemainderDesc = [...staged].sort(
+    (a, b) => b.remainder - a.remainder || b.exactCents - a.exactCents,
+  );
+
+  while (remainingCents >= quantumCents && byRemainderDesc.length) {
+    for (const item of byRemainderDesc) {
+      if (remainingCents < quantumCents) {
+        break;
+      }
+      item.roundedCents += quantumCents;
+      remainingCents -= quantumCents;
+    }
+  }
+
+  if (remainingCents < 0) {
+    const byRemainderAsc = [...staged].sort(
+      (a, b) => a.remainder - b.remainder || a.exactCents - b.exactCents,
+    );
+
+    while (remainingCents <= -quantumCents && byRemainderAsc.length) {
+      for (const item of byRemainderAsc) {
+        if (remainingCents > -quantumCents) {
+          break;
+        }
+        if (item.roundedCents >= quantumCents) {
+          item.roundedCents -= quantumCents;
+          remainingCents += quantumCents;
+        }
+      }
+    }
+  }
+
+  if (remainingCents !== 0) {
+    const largest = [...staged].sort(
+      (a, b) => b.roundedCents - a.roundedCents,
+    )[0];
+    if (largest) {
+      largest.roundedCents += remainingCents;
+    }
+  }
+
+  const roundedByIndex = new Map(
+    staged.map((item) => [item.index, item.roundedCents / 100]),
+  );
+
+  return allocations.map((allocation, index) => ({
+    ...allocation,
+    allocatedAmount:
+      roundedByIndex.get(index) ?? allocation.allocatedAmount,
+  }));
+}
+
 export default function InvestmentCalculator() {
   const { showToast } = useToast();
   const {
@@ -76,6 +178,10 @@ export default function InvestmentCalculator() {
 
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [currency, setCurrency] = useState("INR");
+  const [roundOffEnabled, setRoundOffEnabled] = useState(false);
+  const [lastRequestedAmount, setLastRequestedAmount] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     fetch("/api/investments/metadata")
@@ -93,7 +199,7 @@ export default function InvestmentCalculator() {
       .catch(() => setMetadata(null));
   }, []);
 
-  const categorizedResults = useMemo(() => {
+  const categorizedResults = useMemo<AllocationResult[]>(() => {
     if (!allocations || !metadata) {
       return [];
     }
@@ -114,12 +220,27 @@ export default function InvestmentCalculator() {
     });
   }, [allocations, metadata]);
 
+  const displayedResults = useMemo(() => {
+    if (!roundOffEnabled) {
+      return categorizedResults;
+    }
+
+    const targetTotal =
+      lastRequestedAmount ??
+      categorizedResults.reduce(
+        (sum, result) => sum + result.allocatedAmount,
+        0,
+      );
+
+    return roundAllocationsPreservingTotal(categorizedResults, targetTotal);
+  }, [categorizedResults, lastRequestedAmount, roundOffEnabled]);
+
   const groupedResults = useMemo(() => {
-    if (!allocations || !metadata) {
+    if (!displayedResults.length) {
       return {};
     }
 
-    return categorizedResults.reduce(
+    return displayedResults.reduce(
       (accumulator, result) => {
         if (!accumulator[result.categoryName]) {
           accumulator[result.categoryName] = [];
@@ -127,9 +248,9 @@ export default function InvestmentCalculator() {
         accumulator[result.categoryName].push(result);
         return accumulator;
       },
-      {} as Record<string, typeof categorizedResults>,
+      {} as Record<string, AllocationResult[]>,
     );
-  }, [allocations, categorizedResults, metadata]);
+  }, [displayedResults]);
 
   const currencyMeta = useMemo(
     () => currencies.find((item) => item.value === currency) ?? currencies[0],
@@ -138,19 +259,19 @@ export default function InvestmentCalculator() {
 
   const totalAllocated = useMemo(
     () =>
-      categorizedResults.reduce(
+      displayedResults.reduce(
         (runningTotal, result) => runningTotal + result.allocatedAmount,
         0,
       ),
-    [categorizedResults],
+    [displayedResults],
   );
 
   const handleCopyAll = () => {
-    if (!categorizedResults.length) {
+    if (!displayedResults.length) {
       return;
     }
 
-    const text = categorizedResults
+    const text = displayedResults
       .map(
         (result) =>
           `${result.categoryName} > ${result.instrumentType}: ${
@@ -165,6 +286,7 @@ export default function InvestmentCalculator() {
 
   const onSubmit = async (data: { amount: number }) => {
     try {
+      setLastRequestedAmount(data.amount);
       const response = await fetch("/api/calculator", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -184,6 +306,7 @@ export default function InvestmentCalculator() {
       showToast("Allocations optimized successfully", "success");
     } catch (error) {
       setAllocations(null);
+      setLastRequestedAmount(null);
       showToast((error as Error).message, "error");
     }
   };
@@ -333,6 +456,19 @@ export default function InvestmentCalculator() {
                 />
               </Stack>
             </Grid>
+            <Grid size={{ xs: 12 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={roundOffEnabled}
+                    onChange={(event) =>
+                      setRoundOffEnabled(event.target.checked)
+                    }
+                  />
+                }
+                label="Round off allocations (nearest 100) while preserving total"
+              />
+            </Grid>
           </Grid>
         </form>
       </Paper>
@@ -362,7 +498,7 @@ export default function InvestmentCalculator() {
               <Typography variant="h5">Optimization Results</Typography>
               <Chip
                 size="small"
-                label={`${categorizedResults.length} recommendations`}
+                label={`${displayedResults.length} recommendations`}
                 color="primary"
                 variant="outlined"
               />
