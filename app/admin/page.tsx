@@ -30,9 +30,10 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { alpha } from "@mui/material/styles";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect, useMemo, useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 const categorySchema = z.object({
@@ -56,20 +57,51 @@ const instrumentFormSchema = z.object({
   instruments: z.array(instrumentSchema).min(0),
 });
 
+type AdminUser = {
+  _id: string;
+  name?: string;
+  email: string;
+  role: string;
+  approved: boolean;
+};
+
+type CategoryApiItem = {
+  _id: string;
+  name: string;
+  percentage: number;
+};
+
+type InstrumentApiItem = {
+  _id: string;
+  type: string;
+  categoryId: string | { toString: () => string };
+  inv_percentage: number;
+};
+
+type BootstrapResponse = {
+  categories?: CategoryApiItem[];
+  instruments?: InstrumentApiItem[];
+  users?: AdminUser[];
+  error?: string;
+};
+
+type CategorySaveResponse = {
+  categories: CategoryApiItem[];
+  error?: string;
+};
+
+type InstrumentSaveResponse = {
+  instruments: InstrumentApiItem[];
+  error?: string;
+};
+
 import { useToast } from "@/lib/toast";
 
 export default function AdminPage() {
   const { showToast } = useToast();
   const { data: session, status } = useSession();
-  const [users, setUsers] = useState<
-    {
-      _id: string;
-      name?: string;
-      email: string;
-      role: string;
-      approved: boolean;
-    }[]
-  >([]);
+  const router = useRouter();
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showOnlyPending, setShowOnlyPending] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -106,7 +138,14 @@ export default function AdminPage() {
   const canSubmitCategories = categoryForm.formState.isDirty;
   const canSubmitInstruments = instrumentForm.formState.isDirty;
 
-  const categoryOptions = categoryForm.watch("categories") ?? [];
+  const watchedCategories = useWatch({
+    control: categoryForm.control,
+    name: "categories",
+  });
+  const categoryOptions = useMemo(
+    () => watchedCategories ?? [],
+    [watchedCategories],
+  );
   const currentCategorySum = useMemo(() => {
     return categoryOptions.reduce(
       (sum, cat) => sum + (Number(cat.percentage) || 0),
@@ -114,49 +153,47 @@ export default function AdminPage() {
     );
   }, [categoryOptions]);
 
-  const loadAdminData = async () => {
+  const loadAdminData = useCallback(async () => {
     try {
-      const [catRes, instRes, userRes] = await Promise.all([
-        fetch("/api/admin/categories"),
-        fetch("/api/admin/instruments"),
-        fetch("/api/admin/users"),
-      ]);
+      const response = await fetch("/api/admin/bootstrap");
+      const payload: BootstrapResponse = await response.json();
 
-      const [categories, instruments, usersData] = await Promise.all([
-        catRes.json(),
-        instRes.json(),
-        userRes.json(),
-      ]);
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Unable to load admin data.");
+      }
 
       categoryForm.reset({
-        categories: (categories?.categories ?? []).map((c: any) => ({
+        categories: (payload?.categories ?? []).map((c) => ({
           ...c,
           id: c._id,
         })),
       });
       instrumentForm.reset({
-        instruments: (instruments?.instruments ?? []).map((i: any) => ({
+        instruments: (payload?.instruments ?? []).map((i) => ({
           ...i,
           id: i._id,
           categoryId: i.categoryId?.toString() ?? "",
         })),
       });
-      setUsers(usersData?.users ?? []);
+      setUsers(payload?.users ?? []);
     } catch {
       showToast("Unable to load admin data.", "error");
     } finally {
       setIsLoadingData(false);
     }
-  };
+  }, [categoryForm, instrumentForm, showToast]);
 
   useEffect(() => {
-    if (session && session.user?.role !== "admin") {
-      window.location.href = "/";
+    if (status === "loading") {
       return;
     }
-    loadAdminData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+
+    if (session && session.user?.role !== "admin") {
+      router.replace("/");
+      return;
+    }
+    void loadAdminData();
+  }, [loadAdminData, router, session, status]);
 
   const onSubmitCategories = async (
     data: z.infer<typeof categoryFormSchema>,
@@ -167,12 +204,12 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      const payload = await response.json();
+      const payload: CategorySaveResponse = await response.json();
       if (!response.ok) {
         throw new Error(payload.error ?? "Failed to save categories");
       }
       categoryForm.reset({
-        categories: payload.categories.map((c: any) => ({ ...c, id: c._id })),
+        categories: payload.categories.map((c) => ({ ...c, id: c._id })),
       });
       showToast("Category targets updated", "success");
     } catch (error) {
@@ -189,12 +226,12 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      const payload = await response.json();
+      const payload: InstrumentSaveResponse = await response.json();
       if (!response.ok) {
         throw new Error(payload.error ?? "Failed to save instruments");
       }
       instrumentForm.reset({
-        instruments: payload.instruments.map((i: any) => ({
+        instruments: payload.instruments.map((i) => ({
           ...i,
           id: i._id,
           categoryId: i.categoryId?.toString() ?? "",

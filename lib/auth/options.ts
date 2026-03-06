@@ -38,6 +38,17 @@ export const authOptions: NextAuthOptions = {
         : false;
       const existing = await UserModel.findOne({ email: normalizedEmail });
 
+      if (!isAdmin && !existing) {
+        const pendingUsersCount = await UserModel.countDocuments({
+          approved: false,
+          role: "user",
+        });
+
+        if (pendingUsersCount >= 3) {
+          return "/auth/signin?error=PendingLimitReached";
+        }
+      }
+
       await UserModel.findOneAndUpdate(
         { email: normalizedEmail },
         {

@@ -19,8 +19,8 @@ export default function ThemeToggle({ variant = "icon" }: ThemeToggleProps) {
     [resolvedTheme],
   );
 
-  const oppositeTheme = resolvedTheme === "dark" ? "light" : "dark";
   const checked = resolvedTheme === "dark";
+  const oppositeTheme = checked ? "light" : "dark";
 
   if (variant === "switch") {
     return (

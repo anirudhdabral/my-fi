@@ -1,6 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Box from "@mui/material/Box";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Roboto } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
@@ -24,6 +24,12 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: "MyFi",
   description: "Investment rebalancing",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "MyFi",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -34,6 +40,10 @@ export const metadata: Metadata = {
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#6366f1",
 };
 
 export default function RootLayout({

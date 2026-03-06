@@ -20,23 +20,42 @@ import {
   ColorLens as ThemeIcon,
   Settings as AdminIcon,
 } from "@mui/icons-material";
-import { useState } from "react";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
-import ThemeToggle from "./ThemeToggle";
 import { useToast } from "@/lib/toast";
+
+const ThemeToggle = dynamic(() => import("./ThemeToggle"), { ssr: false });
 
 export default function Navbar() {
   const { showToast } = useToast();
   const { data: session } = useSession();
+  const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const isAdmin = session?.user?.role === "admin";
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    if (isAdmin) {
+      router.prefetch("/admin");
+    }
     setAnchorEl(event.currentTarget);
   };
 
   const handleCloseUserMenu = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    if (isAdmin) {
+      router.prefetch("/admin");
+      return;
+    }
+
+    if (!session) {
+      router.prefetch("/auth/signin");
+    }
+  }, [isAdmin, router, session]);
 
   return (
     <AppBar
@@ -169,25 +188,21 @@ export default function Navbar() {
                         >
                           {session.user?.email}
                         </Typography>
-                        <Chip
-                          size="small"
-                          label={
-                            session.user?.role === "admin" ? "Admin" : "User"
-                          }
-                          color={
-                            session.user?.role === "admin"
-                              ? "primary"
-                              : "default"
-                          }
-                          sx={{ mt: 1, height: 22, fontWeight: 700 }}
-                        />
+                        {isAdmin && (
+                          <Chip
+                            size="small"
+                            label={"Admin"}
+                            color={"primary"}
+                            sx={{ mt: 1, height: 22, fontWeight: 700 }}
+                          />
+                        )}
                       </Box>
                     </Box>
 
                     <Divider sx={{ opacity: 0.6 }} />
 
                     <Box sx={{ p: 1 }}>
-                      {session?.user?.role === "admin" && (
+                      {isAdmin && (
                         <MenuItem
                           component={Link}
                           href="/admin"

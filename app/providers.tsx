@@ -8,7 +8,7 @@ import {
   ThemeProvider as NextThemesProvider,
   useTheme as useNextTheme,
 } from "next-themes";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 
 const getDesignTokens = (mode: PaletteMode) => ({
   palette: {
@@ -90,12 +90,15 @@ const getDesignTokens = (mode: PaletteMode) => ({
 
 function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
   const { resolvedTheme } = useNextTheme();
-  // Handle SSR: wait until component is mounted to show corrected theme
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const isHydrated = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
 
+  // Keep server and hydration render aligned (light), then switch after hydrate.
   const mode = (
-    mounted && resolvedTheme === "dark" ? "dark" : "light"
+    isHydrated && resolvedTheme === "dark" ? "dark" : "light"
   ) as PaletteMode;
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
 
