@@ -22,7 +22,11 @@ async function getCurrentUser(token: JWT) {
 
 export async function requireAdmin(req: Request) {
   const token = await getJwt(req);
-  const currentUser = token ? await getCurrentUser(token) : null;
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
+  const currentUser = await getCurrentUser(token);
 
   if (!currentUser || currentUser.role !== "admin") {
     throw new Error("Unauthorized");
@@ -36,9 +40,13 @@ export async function requireAdmin(req: Request) {
 
 export async function requireSession(req: Request) {
   const token = await getJwt(req);
-  const currentUser = token ? await getCurrentUser(token) : null;
+  if (!token) {
+    throw new Error("Authentication required");
+  }
 
-  if (!token || !currentUser) {
+  const currentUser = await getCurrentUser(token);
+
+  if (!currentUser) {
     throw new Error("Authentication required");
   }
 

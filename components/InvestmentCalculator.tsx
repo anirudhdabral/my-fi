@@ -1,33 +1,31 @@
 "use client";
 
+import { useToast } from "@/lib/toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
+import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
+import ListItemText from "@mui/material/ListItemText";
+import MenuItem from "@mui/material/MenuItem";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Paper from "@mui/material/Paper";
+import Select from "@mui/material/Select";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Box,
-  Button,
-  Chip,
-  CircularProgress,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  OutlinedInput,
-  Paper,
-  Select,
-  Stack,
-  TextField,
-  Typography,
-  Checkbox,
-  ListItemText,
-} from "@mui/material";
-import Grid from "@mui/material/Grid";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
-import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
-import { motion } from "framer-motion";
-import { useToast } from "@/lib/toast";
 
 const currencies = [
   { value: "INR", label: "₹ (INR)", symbol: "₹" },
@@ -86,7 +84,9 @@ export default function InvestmentCalculator() {
         setMetadata(payload);
         if (payload?.categories) {
           setSelectedCategoryIds(
-            payload.categories.map((category: InvestmentCategory) => category._id),
+            payload.categories.map(
+              (category: InvestmentCategory) => category._id,
+            ),
           );
         }
       })
@@ -220,6 +220,14 @@ export default function InvestmentCalculator() {
         </Typography>
         <Typography color="text.secondary" sx={{ mb: 3 }}>
           Configure your amount and target buckets to generate a weighted split.
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{ display: "block", mb: 3, color: "warning.main", fontWeight: 600 }}
+        >
+          Disclaimer: I am not a SEBI-registered advisor. This guidance reflects
+          my personal portfolio allocations and is shared for informational
+          purposes only.
         </Typography>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -441,16 +449,23 @@ export default function InvestmentCalculator() {
                         <Typography variant="body2" color="text.secondary">
                           {allocation.instrumentType}
                         </Typography>
-                        <Typography variant="h4" sx={{ mt: 1, fontWeight: 700 }}>
+                        <Typography
+                          variant="h4"
+                          sx={{ mt: 1, fontWeight: 700 }}
+                        >
                           {currencyMeta.symbol}
-                          {allocation.allocatedAmount.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
+                          {allocation.allocatedAmount.toLocaleString(
+                            undefined,
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            },
+                          )}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
                           {(totalAllocated
-                            ? (allocation.allocatedAmount / totalAllocated) * 100
+                            ? (allocation.allocatedAmount / totalAllocated) *
+                              100
                             : 0
                           ).toFixed(2)}
                           % of optimized total

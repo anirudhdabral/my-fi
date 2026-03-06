@@ -1,24 +1,21 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import InvestmentCalculator from "@/components/InvestmentCalculator";
 import {
-  Box,
-  Button,
-  Container,
-  Paper,
-  Stack,
-  Typography,
-  Skeleton,
-  Chip,
-} from "@mui/material";
-import Grid from "@mui/material/Grid";
-import { motion } from "framer-motion";
-import {
-  ShieldRounded as ShieldIcon,
   AutoGraphRounded as InsightsIcon,
   BalanceRounded as RebalanceIcon,
+  ShieldRounded as ShieldIcon,
 } from "@mui/icons-material";
-import InvestmentCalculator from "@/components/InvestmentCalculator";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import Skeleton from "@mui/material/Skeleton";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import { motion } from "framer-motion";
+import { signIn, useSession } from "next-auth/react";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
@@ -109,6 +106,7 @@ export default function HomePage() {
             spacing={3}
             sx={{ position: "relative", zIndex: 1, maxWidth: 700 }}
           >
+
             <Typography
               variant="h2"
               sx={{

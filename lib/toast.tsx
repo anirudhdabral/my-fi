@@ -1,7 +1,9 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
-import { Snackbar, Alert, AlertColor } from "@mui/material";
+import type { AlertColor } from "@mui/material/Alert";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
+import React, { createContext, useCallback, useContext, useState } from "react";
 
 type ToastContextType = {
   showToast: (message: string, severity?: AlertColor) => void;

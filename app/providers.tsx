@@ -1,17 +1,14 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import CssBaseline from "@mui/material/CssBaseline";
+import type { PaletteMode } from "@mui/material/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { SessionProvider } from "next-auth/react";
-import {
-  ThemeProvider as MuiThemeProvider,
-  CssBaseline,
-  createTheme,
-} from "@mui/material";
-import type { PaletteMode } from "@mui/material";
 import {
   ThemeProvider as NextThemesProvider,
   useTheme as useNextTheme,
 } from "next-themes";
+import { useEffect, useMemo, useState } from "react";
 
 const getDesignTokens = (mode: PaletteMode) => ({
   palette: {
@@ -103,10 +100,10 @@ function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
 
   return (
-    <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       {children}
-    </MuiThemeProvider>
+    </ThemeProvider>
   );
 }
 

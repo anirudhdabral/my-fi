@@ -20,6 +20,7 @@ const instrumentListSchema = z.object({
 
 const validateInstrumentPercentages = (
   instruments: z.infer<typeof instrumentSchema>[],
+  categoryNameById: Map<string, string>,
 ) => {
   const grouped = instruments.reduce<Record<string, number>>(
     (acc, instrument) => {
@@ -32,8 +33,9 @@ const validateInstrumentPercentages = (
 
   for (const [categoryId, total] of Object.entries(grouped)) {
     if (Math.abs(total - 100) > 0.01) {
+      const categoryName = categoryNameById.get(categoryId) ?? categoryId;
       throw new Error(
-        `Instrument percentages for category ${categoryId} must equal 100`,
+        `Instrument percentages for category ${categoryName} must equal 100`,
       );
     }
   }
@@ -57,11 +59,16 @@ export async function PUT(req: Request) {
   try {
     await requireAdmin(req);
     const { instruments } = instrumentListSchema.parse(await req.json());
-    validateInstrumentPercentages(instruments);
     await connectMongo();
 
     // ensure referenced categories exist
     const categories = await InvestmentCategoryModel.find().lean();
+    const categoryNameById = new Map(
+      categories.map((category) => [category._id.toString(), category.name]),
+    );
+
+    validateInstrumentPercentages(instruments, categoryNameById);
+
     const validCategoryIds = new Set(
       categories.map((category) => category._id.toString()),
     );

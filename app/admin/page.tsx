@@ -1,44 +1,39 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Box,
-  Button,
-  Container,
-  Divider,
-  IconButton,
-  MenuItem,
-  Paper,
-  Stack,
-  Switch,
-  TextField,
-  Typography,
-  CircularProgress,
-  FormControlLabel,
-  Chip,
-  Tabs,
-  Tab,
-  Alert,
-  Tooltip,
-  Skeleton,
-} from "@mui/material";
-import Grid from "@mui/material/Grid";
-import { alpha } from "@mui/material/styles";
-import {
-  Delete as DeleteIcon,
   Add as AddIcon,
-  Send as SendIcon,
-  Settings as SettingsIcon,
-  People as PeopleIcon,
-  Info as InfoIcon,
   CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon,
+  Delete as DeleteIcon,
+  Info as InfoIcon,
+  People as PeopleIcon,
+  Send as SendIcon,
+  Settings as SettingsIcon
 } from "@mui/icons-material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import Container from "@mui/material/Container";
+import Divider from "@mui/material/Divider";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
+import Skeleton from "@mui/material/Skeleton";
+import Stack from "@mui/material/Stack";
+import Switch from "@mui/material/Switch";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import { alpha } from "@mui/material/styles";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { z } from "zod";
 
 const categorySchema = z.object({
   id: z.string().optional(),
@@ -492,7 +487,6 @@ export default function AdminPage() {
                             }}
                             {...categoryForm.register(
                               `categories.${index}.percentage` as const,
-                              { valueAsNumber: true },
                             )}
                             InputProps={{
                               endAdornment: (
@@ -673,7 +667,6 @@ export default function AdminPage() {
                             }}
                             {...instrumentForm.register(
                               `instruments.${index}.inv_percentage` as const,
-                              { valueAsNumber: true },
                             )}
                             InputProps={{
                               endAdornment: (

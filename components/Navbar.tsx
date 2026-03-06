@@ -1,22 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Box,
-  Chip,
-  Container,
-  Stack,
-  alpha,
-  Avatar,
-  Menu,
-  MenuItem,
-  Divider,
-  ListItemIcon,
-  IconButton,
-} from "@mui/material";
+import AppBar from "@mui/material/AppBar";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import Container from "@mui/material/Container";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Stack from "@mui/material/Stack";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { alpha } from "@mui/material/styles";
 import {
   Logout as LogoutIcon,
   ColorLens as ThemeIcon,
@@ -237,13 +235,13 @@ export default function Navbar() {
                         </ListItemIcon>
                         <Box sx={{ flexGrow: 1 }}>
                           <Typography variant="body2" fontWeight={700}>
-                            Appearance
+                            Dark mode
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
                             Switch between light and dark mode
                           </Typography>
                         </Box>
-                        <ThemeToggle />
+                        <ThemeToggle variant="switch" />
                       </MenuItem>
 
                       <Divider sx={{ my: 0.75, opacity: 0.2 }} />
