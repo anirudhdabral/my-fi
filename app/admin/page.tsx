@@ -8,7 +8,7 @@ import {
   Info as InfoIcon,
   People as PeopleIcon,
   Send as SendIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
 } from "@mui/icons-material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";

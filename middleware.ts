@@ -24,7 +24,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
+  if (
+    PUBLIC_PATHS.some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`),
+    )
+  ) {
     return NextResponse.next();
   }
 
@@ -40,5 +44,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|static|favicon\\.ico|manifest\\.json|robots\\.txt).*)"],
+  matcher: [
+    "/((?!api|_next|static|favicon\\.ico|manifest\\.json|robots\\.txt).*)",
+  ],
 };

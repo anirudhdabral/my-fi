@@ -92,8 +92,7 @@ function roundAllocationsPreservingTotal(
       0,
       Math.round(allocation.allocatedAmount * scale * 100),
     );
-    const roundedCents =
-      Math.floor(exactCents / quantumCents) * quantumCents;
+    const roundedCents = Math.floor(exactCents / quantumCents) * quantumCents;
 
     return {
       index,
@@ -104,8 +103,7 @@ function roundAllocationsPreservingTotal(
   });
 
   let remainingCents =
-    targetCents -
-    staged.reduce((sum, item) => sum + item.roundedCents, 0);
+    targetCents - staged.reduce((sum, item) => sum + item.roundedCents, 0);
 
   const byRemainderDesc = [...staged].sort(
     (a, b) => b.remainder - a.remainder || b.exactCents - a.exactCents,
@@ -154,8 +152,7 @@ function roundAllocationsPreservingTotal(
 
   return allocations.map((allocation, index) => ({
     ...allocation,
-    allocatedAmount:
-      roundedByIndex.get(index) ?? allocation.allocatedAmount,
+    allocatedAmount: roundedByIndex.get(index) ?? allocation.allocatedAmount,
   }));
 }
 
@@ -346,7 +343,12 @@ export default function InvestmentCalculator() {
         </Typography>
         <Typography
           variant="caption"
-          sx={{ display: "block", mb: 3, color: "warning.main", fontWeight: 600 }}
+          sx={{
+            display: "block",
+            mb: 3,
+            color: "warning.main",
+            fontWeight: 600,
+          }}
         >
           Disclaimer: I am not a SEBI-registered advisor. This guidance reflects
           my personal portfolio allocations and is shared for informational

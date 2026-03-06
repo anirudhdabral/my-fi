@@ -49,4 +49,3 @@ export async function sendUserApprovalEmail(recipient: string) {
     html,
   });
 }
-

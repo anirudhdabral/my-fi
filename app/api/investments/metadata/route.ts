@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import connectMongo from "@/lib/mongodb";
-import { InvestmentCategoryModel, InvestmentInstrumentModel } from "@/lib/models";
+import {
+  InvestmentCategoryModel,
+  InvestmentInstrumentModel,
+} from "@/lib/models";
 
 export async function GET() {
   await connectMongo();

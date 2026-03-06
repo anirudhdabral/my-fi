@@ -106,7 +106,6 @@ export default function HomePage() {
             spacing={3}
             sx={{ position: "relative", zIndex: 1, maxWidth: 700 }}
           >
-
             <Typography
               variant="h2"
               sx={{
