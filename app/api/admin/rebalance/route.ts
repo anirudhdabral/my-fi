@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
     const html = `
       <h1>Portfolio Rebalance Required</h1>
-      <p>The latest investment allocation targets for your portfolio are now available in your cockpit.</p>
+      <p>The latest investment allocation targets for your portfolio are now available in your dashboard.</p>
       <p>Please log in to your account and rebalance your investments to stay aligned with your targets.</p>
       <br />
       <a href="${process.env.NEXTAUTH_URL}" style="display: inline-block; padding: 12px 24px; background-color: #6366f1; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Check Targets Now</a>

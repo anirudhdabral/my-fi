@@ -30,7 +30,7 @@ import { motion } from "framer-motion";
 import { useToast } from "@/lib/toast";
 
 const currencies = [
-  { value: "INR", label: "Rs (INR)", symbol: "Rs " },
+  { value: "INR", label: "₹ (INR)", symbol: "₹" },
   { value: "USD", label: "$ (USD)", symbol: "$" },
   { value: "EUR", label: "EUR", symbol: "EUR " },
   { value: "GBP", label: "GBP", symbol: "GBP " },
