@@ -135,7 +135,7 @@ export default function HomePage() {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              MyFi Investment Cockpit
+              MyFi Investment
             </Typography>
             <Typography
               variant="h6"
