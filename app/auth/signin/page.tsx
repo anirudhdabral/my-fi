@@ -10,11 +10,11 @@ import Stack from "@mui/material/Stack";
 import { motion } from "framer-motion";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import { useToast } from "@/lib/toast";
 
-export default function SignInPage() {
+function SignInContent() {
   const { showToast } = useToast();
   const { status } = useSession();
   const router = useRouter();
@@ -150,5 +150,13 @@ export default function SignInPage() {
         </Paper>
       </motion.div>
     </Container>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignInContent />
+    </Suspense>
   );
 }
