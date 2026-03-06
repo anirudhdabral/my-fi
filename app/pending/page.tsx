@@ -3,8 +3,24 @@
 import Link from "next/link";
 import { Container, Box, Typography, Button } from "@mui/material";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function PendingPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.approved) {
+      router.replace("/");
+    }
+  }, [router, session?.user?.approved, status]);
+
+  if (status === "loading") {
+    return null;
+  }
+
   return (
     <Container
       maxWidth="md"
@@ -36,9 +52,15 @@ export default function PendingPage() {
             Your account is awaiting approval from the admin team. You will
             receive an email once access is granted.
           </Typography>
-          <Button component={Link} href="/auth/signin" variant="outlined">
-            Sign in with a different account
-          </Button>
+          {status === "authenticated" ? (
+            <Button component={Link} href="/" variant="outlined">
+              Go to dashboard
+            </Button>
+          ) : (
+            <Button component={Link} href="/auth/signin" variant="outlined">
+              Sign in with a different account
+            </Button>
+          )}
         </Box>
       </motion.div>
     </Container>

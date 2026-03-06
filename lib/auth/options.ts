@@ -51,10 +51,12 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, user }) {
-      if (user?.email) {
+      const emailToLookup = user?.email ?? token.email;
+
+      if (emailToLookup) {
         await connectMongo();
         const dbUser = await UserModel.findOne({
-          email: user.email.toLowerCase(),
+          email: emailToLookup.toLowerCase(),
         });
         if (dbUser) {
           token.role = dbUser.role;

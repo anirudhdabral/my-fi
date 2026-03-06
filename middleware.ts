@@ -36,10 +36,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(signinUrl);
   }
 
-  if (token.approved === false) {
-    return NextResponse.redirect(new URL("/pending", req.url));
-  }
-
   return NextResponse.next();
 }
 

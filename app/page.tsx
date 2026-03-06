@@ -109,19 +109,6 @@ export default function HomePage() {
             spacing={3}
             sx={{ position: "relative", zIndex: 1, maxWidth: 700 }}
           >
-            <Chip
-              label="Institution-grade allocation workspace"
-              color="primary"
-              size="small"
-              sx={{
-                width: "fit-content",
-                fontWeight: 700,
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "rgba(129,140,248,0.2)"
-                    : "rgba(99,102,241,0.12)",
-              }}
-            />
             <Typography
               variant="h2"
               sx={{
