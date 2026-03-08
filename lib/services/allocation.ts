@@ -2,9 +2,14 @@ import connectMongo from "../mongodb";
 import {
   InvestmentCategoryModel,
   InvestmentInstrumentModel,
-  type InvestmentCategoryDocument,
   type InvestmentInstrumentDocument,
 } from "../models";
+
+interface LeanCategory {
+  _id: { toString(): string };
+  name: string;
+  percentage: number;
+}
 
 export interface Allocation {
   instrumentId: string;
@@ -22,7 +27,8 @@ export async function calculateAllocations(
 
   await connectMongo();
 
-  let categories = (await InvestmentCategoryModel.find().lean()) as any[];
+  let categories =
+    (await InvestmentCategoryModel.find().lean()) as LeanCategory[];
 
   if (!categories.length) {
     throw new Error("No investment categories are configured");
@@ -30,9 +36,7 @@ export async function calculateAllocations(
 
   // Filter categories if categoryIds is provided
   if (categoryIds && categoryIds.length > 0) {
-    categories = categories.filter((c) =>
-      categoryIds.includes((c._id as any).toString()),
-    );
+    categories = categories.filter((c) => categoryIds.includes(String(c._id)));
     if (!categories.length) {
       throw new Error("None of the selected categories were found");
     }
