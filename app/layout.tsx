@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Roboto } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import InstallPWA from "@/components/InstallPWA";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,6 +69,7 @@ export default function RootLayout({
             <Box component="main" sx={{ flexGrow: 1 }}>
               {children}
             </Box>
+            <InstallPWA />
           </Box>
         </Providers>
       </body>
