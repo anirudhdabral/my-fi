@@ -175,7 +175,7 @@ export default function InvestmentCalculator() {
 
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [currency, setCurrency] = useState("INR");
-  const [roundOffEnabled, setRoundOffEnabled] = useState(false);
+  const [roundOffEnabled, setRoundOffEnabled] = useState(true);
   const [lastRequestedAmount, setLastRequestedAmount] = useState<number | null>(
     null,
   );
