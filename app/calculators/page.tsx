@@ -1,10 +1,12 @@
 "use client";
 
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Slider from "@mui/material/Slider";
 import Stack from "@mui/material/Stack";
@@ -14,7 +16,8 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { alpha } from "@mui/material/styles";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useMemo, useState } from "react";
 
 // ── constants ────────────────────────────────────────────────────────
 const MIN_AMOUNT = 1_000;
@@ -70,6 +73,7 @@ function fmt(n: number) {
 
 // ── component ────────────────────────────────────────────────────────
 export default function CalculatorsPage() {
+  const router = useRouter();
   const [tab, setTab] = useState(0);
   const activeType = tabMeta[tab].key;
 
@@ -147,9 +151,28 @@ export default function CalculatorsPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <Typography variant="h4" fontWeight={800} sx={{ mb: 0.5 }}>
-          Calculators
-        </Typography>
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={1}
+          sx={{ mb: 1, ml: -1.5 }}
+        >
+          <IconButton
+            onClick={() => router.push("/")}
+            sx={{
+              color: "text.secondary",
+              "&:hover": {
+                color: "primary.main",
+                bgcolor: alpha("#000", 0.05),
+              },
+            }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h4" fontWeight={800}>
+            Calculators
+          </Typography>
+        </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           Estimate returns for SIP, Lumpsum, and Fixed Deposits.
         </Typography>
@@ -203,7 +226,7 @@ export default function CalculatorsPage() {
                       type="number"
                       size="small"
                       value={amount}
-                      onChange={(e) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const val = e.target.value;
                         if (val === "") {
                           setAmount("");
@@ -222,7 +245,7 @@ export default function CalculatorsPage() {
                           setAmount(MIN_AMOUNT.toString());
                         }
                       }}
-                      onKeyDown={(e) => {
+                      onKeyDown={(e: React.KeyboardEvent) => {
                         if (blockKeys.includes(e.key)) e.preventDefault();
                       }}
                       inputProps={{ min: MIN_AMOUNT, max: MAX_AMOUNT }}
@@ -268,7 +291,7 @@ export default function CalculatorsPage() {
                       type="number"
                       size="small"
                       value={rate}
-                      onChange={(e) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const val = e.target.value;
                         if (val === "") {
                           setRate("");
@@ -287,7 +310,7 @@ export default function CalculatorsPage() {
                           setRate(MIN_RATE.toString());
                         }
                       }}
-                      onKeyDown={(e) => {
+                      onKeyDown={(e: React.KeyboardEvent) => {
                         if (blockKeys.includes(e.key)) e.preventDefault();
                       }}
                       inputProps={{ min: MIN_RATE, max: MAX_RATE, step: 0.1 }}
@@ -331,7 +354,7 @@ export default function CalculatorsPage() {
                       type="number"
                       size="small"
                       value={years}
-                      onChange={(e) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const val = e.target.value;
                         if (val === "") {
                           setYears("");
@@ -350,7 +373,7 @@ export default function CalculatorsPage() {
                           setYears(MIN_YEARS.toString());
                         }
                       }}
-                      onKeyDown={(e) => {
+                      onKeyDown={(e: React.KeyboardEvent) => {
                         if (blockKeys.includes(e.key)) e.preventDefault();
                       }}
                       inputProps={{ min: MIN_YEARS, max: MAX_YEARS }}
@@ -447,9 +470,8 @@ export default function CalculatorsPage() {
                     <Typography
                       variant="body1"
                       fontWeight={700}
-                      color="emerald.main"
                       sx={{
-                        color: (theme) =>
+                        color: (theme: any) =>
                           theme.palette.mode === "dark" ? "#34d399" : "#059669",
                       }}
                     >
