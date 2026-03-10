@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -75,7 +76,7 @@ function SignInContent() {
     <Container
       maxWidth="sm"
       sx={{
-        minHeight: "calc(100vh - 72px)",
+        minHeight: "calc(100vh - 56px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -84,43 +85,33 @@ function SignInContent() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
         <Paper
           sx={{
-            p: 2,
-            borderRadius: 5,
-            background: (theme) =>
-              theme.palette.mode === "dark"
-                ? "linear-gradient(160deg, rgba(17,22,34,0.9), rgba(11,16,25,0.9))"
-                : "linear-gradient(160deg, rgba(255,255,255,0.92), rgba(248,251,255,0.92))",
-            backdropFilter: "blur(10px)",
+            p: 3,
+            bgcolor: "background.paper",
             border: "1px solid",
             borderColor: "divider",
-            width: { xs: 300, sm: 340 },
+            width: { xs: 300, sm: 320 },
           }}
         >
-          <Stack spacing={1.5} sx={{ mx: "auto" }}>
-            {isPaused && (
-              <Alert severity="warning">
-                Sign-ins are temporarily paused. Please try again later.
-              </Alert>
-            )}
-            <Button
-              variant="outlined"
-              size="large"
-              startIcon={<ArrowBackIcon />}
-              onClick={() => router.push("/")}
+          <Stack spacing={2}>
+            <Typography
+              variant="h6"
               sx={{
-                borderRadius: 999,
-                py: 1.2,
+                textAlign: "center",
                 fontWeight: 700,
-                borderWidth: 1.5,
-                "&:hover": { borderWidth: 1.5, transform: "translateY(-1px)" },
+                mb: 0.5,
               }}
             >
-              Back
-            </Button>
+              Sign in to MyFi
+            </Typography>
+
+            {isPaused && (
+              <Alert severity="warning">Sign-ins are temporarily paused.</Alert>
+            )}
+
             <Button
               variant="contained"
               size="large"
@@ -134,17 +125,24 @@ function SignInContent() {
                 signIn("google", { callbackUrl: "/" });
               }}
               sx={{
-                borderRadius: 999,
-                py: 1.2,
-                fontWeight: 800,
-                boxShadow: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "0 10px 24px rgba(99,102,241,0.35)"
-                    : "0 10px 24px rgba(79,70,229,0.28)",
-                "&:hover": { transform: "translateY(-1px)" },
+                py: 1.25,
+                fontWeight: 700,
               }}
             >
-              Sign in with Google
+              Continue with Google
+            </Button>
+
+            <Button
+              variant="text"
+              size="small"
+              startIcon={<ArrowBackIcon sx={{ fontSize: "16px !important" }} />}
+              onClick={() => router.push("/")}
+              sx={{
+                color: "text.secondary",
+                fontWeight: 500,
+              }}
+            >
+              Back to home
             </Button>
           </Stack>
         </Paper>

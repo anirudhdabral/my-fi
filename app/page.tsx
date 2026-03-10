@@ -1,244 +1,175 @@
 "use client";
 
 import InvestmentCalculator from "@/components/InvestmentCalculator";
-import {
-  AutoGraphRounded as InsightsIcon,
-  BalanceRounded as RebalanceIcon,
-  ShieldRounded as ShieldIcon,
-} from "@mui/icons-material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 import { signIn, useSession } from "next-auth/react";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import HourglassEmptyRoundedIcon from "@mui/icons-material/HourglassEmptyRounded";
 
 export default function HomePage() {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
     return (
-      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
-        <Stack spacing={6}>
+      <Container maxWidth="md" sx={{ py: { xs: 6, md: 10 } }}>
+        <Stack spacing={4}>
           <Skeleton
             variant="rectangular"
             width="100%"
-            height={400}
-            sx={{ borderRadius: 4 }}
+            height={180}
+            sx={{ borderRadius: 2.5 }}
           />
-          <Box>
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={200}
-              sx={{ borderRadius: 4, mb: 4 }}
-            />
-            <Grid container spacing={4}>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Skeleton
-                  variant="rectangular"
-                  width="100%"
-                  height={150}
-                  sx={{ borderRadius: 4 }}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Skeleton
-                  variant="rectangular"
-                  width="100%"
-                  height={150}
-                  sx={{ borderRadius: 4 }}
-                />
-              </Grid>
-            </Grid>
-          </Box>
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={300}
+            sx={{ borderRadius: 2.5 }}
+          />
         </Stack>
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-      >
-        <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 4, md: 6 },
-            mb: 6,
-            position: "relative",
-            overflow: "hidden",
-            borderRadius: 4,
-            background: (theme) =>
-              theme.palette.mode === "dark"
-                ? "linear-gradient(135deg, #16161a 0%, #0a0a0c 100%)"
-                : "linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)",
-            border: (theme) =>
-              `1px solid ${
-                theme.palette.mode === "dark"
-                  ? "rgba(255,255,255,0.08)"
-                  : "rgba(99,102,241,0.1)"
-              }`,
-          }}
+    <Container maxWidth="md" sx={{ py: { xs: 5, md: 8 } }}>
+      {/* Hero Section — only for unauthenticated users */}
+      {!session && (
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          {/* Decorative background element */}
           <Box
             sx={{
-              position: "absolute",
-              top: -100,
-              right: -100,
-              width: 300,
-              height: 300,
-              background:
-                "radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)",
-              zIndex: 0,
+              textAlign: "center",
+              py: { xs: 8, md: 14 },
+              px: { xs: 3, md: 6 },
+              position: "relative",
             }}
-          />
-
-          <Stack
-            spacing={3}
-            sx={{ position: "relative", zIndex: 1, maxWidth: 700 }}
           >
-            <Typography
-              variant="h2"
+            {/* Decorative gradient orb */}
+            <Box
               sx={{
-                fontSize: { xs: "2.2rem", md: "3.4rem" },
-                lineHeight: 1.1,
+                position: "absolute",
+                top: "10%",
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: 400,
+                height: 400,
                 background: (theme) =>
                   theme.palette.mode === "dark"
-                    ? "linear-gradient(to bottom right, #fff, #94a3b8)"
-                    : "linear-gradient(to bottom right, #1e293b, #64748b)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                    ? "radial-gradient(circle, rgba(196,181,253,0.08) 0%, transparent 65%)"
+                    : "radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 65%)",
+                pointerEvents: "none",
+                zIndex: 0,
               }}
-            >
-              MyFi Investment
-            </Typography>
-            <Typography
-              variant="h6"
-              color="text.secondary"
-              sx={{ lineHeight: 1.6, fontWeight: 400 }}
-            >
-              Precision allocation management for the modern investor. Securely
-              scale your wealth with data-driven insights and automated
-              rebalancing.
-            </Typography>
-            {!session && (
-              <Stack direction="row" spacing={1.25} sx={{ pt: 1 }}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  onClick={() => signIn()}
-                  sx={{ borderRadius: 999, px: 4, py: 1.25, fontWeight: 700 }}
-                >
-                  Sign In
-                </Button>
-              </Stack>
-            )}
-          </Stack>
-        </Paper>
-      </motion.div>
-
-      {!session && (
-        <Grid
-          id="platform-highlights"
-          container
-          spacing={3}
-          sx={{ mb: { xs: 5, md: 7 } }}
-        >
-          {[
-            {
-              title: "Secure Access Controls",
-              description:
-                "Approval-based access and role boundaries keep portfolio operations tightly governed.",
-              icon: <ShieldIcon fontSize="small" />,
-            },
-            {
-              title: "Data-Driven Insights",
-              description:
-                "Allocation decisions are backed by structured inputs and repeatable calculation flows.",
-              icon: <InsightsIcon fontSize="small" />,
-            },
-            {
-              title: "Rebalance Ready",
-              description:
-                "Detect gaps, align targets, and move from intent to rebalancing with confidence.",
-              icon: <RebalanceIcon fontSize="small" />,
-            },
-          ].map((item) => (
-            <Grid key={item.title} size={{ xs: 12, md: 4 }}>
-              <Paper
+            />
+            <Box sx={{ position: "relative", zIndex: 1 }}>
+              <Typography
+                variant="h2"
                 sx={{
-                  p: 3,
-                  height: "100%",
-                  borderRadius: 4,
+                  fontSize: { xs: "2rem", sm: "2.75rem", md: "3.5rem" },
+                  lineHeight: 1.1,
+                  mb: 2,
                   background: (theme) =>
                     theme.palette.mode === "dark"
-                      ? "linear-gradient(160deg, #151923 0%, #0f131d 100%)"
-                      : "linear-gradient(160deg, #ffffff 0%, #f8fbff 100%)",
+                      ? "linear-gradient(135deg, #e4e4e7 0%, #52525b 100%)"
+                      : "linear-gradient(135deg, #18181b 0%, #71717a 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
                 }}
               >
-                <Stack spacing={1.5}>
-                  <Box
-                    sx={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 2,
-                      display: "grid",
-                      placeItems: "center",
-                      bgcolor: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? "rgba(129,140,248,0.16)"
-                          : "rgba(99,102,241,0.1)",
-                      color: "primary.main",
-                    }}
-                  >
-                    {item.icon}
-                  </Box>
-                  <Typography variant="subtitle1" fontWeight={700}>
-                    {item.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {item.description}
-                  </Typography>
-                </Stack>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
+                Smart portfolio
+                <br />
+                allocation
+              </Typography>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{
+                  maxWidth: 400,
+                  mx: "auto",
+                  mb: 4,
+                  fontSize: { xs: "0.95rem", md: "1.05rem" },
+                  lineHeight: 1.7,
+                }}
+              >
+                Calculate optimized investment splits across your asset classes.
+              </Typography>
+              <Button
+                variant="contained"
+                size="large"
+                endIcon={<ArrowForwardIcon />}
+                onClick={() => signIn()}
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  fontSize: "0.95rem",
+                }}
+              >
+                Get Started
+              </Button>
+            </Box>
+          </Box>
+        </motion.div>
       )}
 
-      <Box sx={{ mb: 8 }}>
-        {session &&
-          (session.user?.approved ? (
+      {/* Main Content */}
+      {session && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {session.user?.approved ? (
             <InvestmentCalculator />
           ) : (
             <Paper
               sx={{
-                p: 4,
+                p: { xs: 4, md: 5 },
                 textAlign: "center",
-                bgcolor: "warning.main",
-                color: "warning.contrastText",
-                borderRadius: 4,
+                border: (theme) =>
+                  `1px solid ${
+                    theme.palette.mode === "dark"
+                      ? "rgba(252,211,77,0.12)"
+                      : "rgba(217,119,6,0.1)"
+                  }`,
+                background: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "rgba(252,211,77,0.03)"
+                    : "rgba(217,119,6,0.02)",
               }}
             >
-              <Typography variant="h6" fontWeight={700}>
+              <HourglassEmptyRoundedIcon
+                sx={{
+                  fontSize: 36,
+                  color: "warning.main",
+                  mb: 2,
+                  opacity: 0.6,
+                }}
+              />
+              <Typography variant="h6" fontWeight={700} sx={{ mb: 1 }}>
                 Access Pending
               </Typography>
-              <Typography variant="body2">
-                Your account is currently waiting for admin approval. You will
-                be able to use the allocation engine once approved.
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ maxWidth: 360, mx: "auto" }}
+              >
+                Your account is waiting for admin approval. You&apos;ll get
+                access once approved.
               </Typography>
             </Paper>
-          ))}
-      </Box>
+          )}
+        </motion.div>
+      )}
     </Container>
   );
 }

@@ -1,30 +1,20 @@
 import Navbar from "@/components/Navbar";
 import Box from "@mui/material/Box";
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Roboto } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import InstallPWA from "@/components/InstallPWA";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const roboto = Roboto({
-  variable: "--font-roboto",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "700", "900"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
   title: "MyFi",
-  description: "Investment rebalancing",
+  description: "Smart portfolio allocation engine",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -44,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#6366f1",
+  themeColor: "#7c3aed",
 };
 
 export default function RootLayout({
@@ -54,9 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable}`}
-      >
+      <body className={inter.variable}>
         <Providers>
           <Box
             sx={{

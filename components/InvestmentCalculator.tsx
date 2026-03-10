@@ -2,15 +2,11 @@
 
 import { useToast } from "@/lib/toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import InsightsRoundedIcon from "@mui/icons-material/InsightsRounded";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
-import Chip from "@mui/material/Chip";
-import CircularProgress from "@mui/material/CircularProgress";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
@@ -24,20 +20,21 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { alpha } from "@mui/material/styles";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const currencies = [
-  { value: "INR", label: "₹ (INR)", symbol: "₹" },
-  { value: "USD", label: "$ (USD)", symbol: "$" },
-  { value: "EUR", label: "EUR", symbol: "EUR " },
-  { value: "GBP", label: "GBP", symbol: "GBP " },
+  { value: "INR", label: "₹ INR", symbol: "₹" },
+  { value: "USD", label: "$ USD", symbol: "$" },
+  { value: "EUR", label: "€ EUR", symbol: "€" },
+  { value: "GBP", label: "£ GBP", symbol: "£" },
 ];
 
 const calculatorSchema = z.object({
-  amount: z.coerce.number().positive(),
+  amount: z.coerce.number().min(1000, "Min ₹1,000").max(10_00_000, "Max ₹10 L"),
 });
 
 type InvestmentCategory = {
@@ -161,11 +158,15 @@ export default function InvestmentCalculator() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    setValue,
+    watch,
+    formState: { errors },
   } = useForm<{ amount: number }>({
     resolver: zodResolver(calculatorSchema),
     defaultValues: { amount: 10000 },
   });
+
+  const watchedAmount = watch("amount");
 
   const [allocations, setAllocations] = useState<Allocation[] | null>(null);
   const [metadata, setMetadata] = useState<{
@@ -186,15 +187,77 @@ export default function InvestmentCalculator() {
       .then((payload) => {
         setMetadata(payload);
         if (payload?.categories) {
-          setSelectedCategoryIds(
-            payload.categories.map(
-              (category: InvestmentCategory) => category._id,
-            ),
+          const allIds = payload.categories.map(
+            (category: InvestmentCategory) => category._id,
           );
+          setSelectedCategoryIds(allIds);
         }
       })
       .catch(() => setMetadata(null));
   }, []);
+
+  // Real-time calculation logic
+  useEffect(() => {
+    if (
+      !metadata ||
+      !watchedAmount ||
+      watchedAmount < 1000 ||
+      !selectedCategoryIds.length
+    ) {
+      setAllocations(null);
+      setLastRequestedAmount(null);
+      return;
+    }
+
+    try {
+      const { categories, instruments } = metadata;
+      let targetCategories = categories.filter((c) =>
+        selectedCategoryIds.includes(c._id),
+      );
+
+      if (!targetCategories.length) return;
+
+      // Rescale percentages
+      const selectionTotal = targetCategories.reduce(
+        (sum, c) => sum + c.percentage,
+        0,
+      );
+      const rescaledCategories = targetCategories.map((c) => ({
+        ...c,
+        percentage: (c.percentage / selectionTotal) * 100,
+      }));
+
+      const instrumentsByCategory = instruments.reduce<
+        Record<string, InvestmentInstrument[]>
+      >((acc, inst) => {
+        acc[inst.categoryId] = acc[inst.categoryId]
+          ? [...acc[inst.categoryId], inst]
+          : [inst];
+        return acc;
+      }, {});
+
+      const newAllocations: Allocation[] = [];
+      for (const cat of rescaledCategories) {
+        const catAmount = (watchedAmount * cat.percentage) / 100;
+        const catInstruments = instrumentsByCategory[cat._id] ?? [];
+
+        for (const inst of catInstruments) {
+          newAllocations.push({
+            instrumentId: inst._id,
+            categoryId: cat._id,
+            allocatedAmount: Number(
+              ((catAmount * inst.inv_percentage) / 100).toFixed(2),
+            ),
+          });
+        }
+      }
+
+      setLastRequestedAmount(watchedAmount);
+      setAllocations(newAllocations);
+    } catch (err) {
+      console.error("Calculation error:", err);
+    }
+  }, [watchedAmount, selectedCategoryIds, metadata]);
 
   const categorizedResults = useMemo<AllocationResult[]>(() => {
     if (!allocations || !metadata) {
@@ -278,86 +341,59 @@ export default function InvestmentCalculator() {
       .join("\n");
 
     navigator.clipboard.writeText(text);
-    showToast("Results copied to clipboard", "success");
+    showToast("Copied to clipboard", "success");
   };
 
-  const onSubmit = async (data: { amount: number }) => {
-    try {
-      setLastRequestedAmount(data.amount);
-      const response = await fetch("/api/calculator", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          categoryIds: selectedCategoryIds,
-        }),
-      });
-
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Failed to calculate allocations");
-      }
-
-      setAllocations(payload.allocations);
-      showToast("Allocations optimized successfully", "success");
-    } catch (error) {
-      setAllocations(null);
-      setLastRequestedAmount(null);
-      showToast((error as Error).message, "error");
-    }
+  const onSubmit = (data: { amount: number }) => {
+    // Handled by real-time effect now
   };
+
+  // Accent colors for category groups
+  const categoryAccents = [
+    { light: "#7c3aed", dark: "#c4b5fd" }, // violet
+    { light: "#d97706", dark: "#fbbf24" }, // amber
+    { light: "#0891b2", dark: "#67e8f9" }, // cyan
+    { light: "#dc2626", dark: "#fca5a5" }, // red
+    { light: "#059669", dark: "#6ee7b7" }, // emerald
+  ];
 
   return (
     <>
+      {/* Input Form */}
       <Paper
         component={motion.div}
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
         sx={{
           p: { xs: 3, md: 4 },
-          mb: 4,
-          background: (theme) =>
-            theme.palette.mode === "dark"
-              ? "linear-gradient(160deg, #151923 0%, #0f131d 100%)"
-              : "linear-gradient(160deg, #ffffff 0%, #f8fbff 100%)",
-          backdropFilter: "blur(12px)",
-          border: (theme) =>
-            theme.palette.mode === "dark"
-              ? "1px solid rgba(255,255,255,0.08)"
-              : "1px solid rgba(0,0,0,0.05)",
-          borderRadius: 4,
+          mb: 3,
         }}
       >
-        <Typography
-          variant="h5"
-          mb={1}
-          sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
-        >
-          <AutoAwesomeIcon sx={{ color: "primary.main" }} />
+        <Typography variant="h5" sx={{ mb: 0.5 }}>
           Allocation Engine
         </Typography>
-        <Typography color="text.secondary" sx={{ mb: 3 }}>
-          Configure your amount and target buckets to generate a weighted split.
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          Configure amount and target buckets to generate a weighted split.
         </Typography>
+
         <Typography
           variant="caption"
           sx={{
             display: "block",
             mb: 3,
             color: "warning.main",
-            fontWeight: 600,
+            fontWeight: 500,
+            opacity: 0.8,
           }}
         >
-          Disclaimer: I am not a SEBI-registered advisor. This guidance reflects
-          my personal portfolio allocations and is shared for informational
-          purposes only.
+          Not financial advice. Reflects personal portfolio allocations for
+          informational purposes only.
         </Typography>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={3} alignItems="flex-end">
-            <Grid size={{ xs: 12, md: 3 }}>
+          <Grid container spacing={2.5} alignItems="flex-end">
+            <Grid size={{ xs: 12, sm: 4, md: 3 }}>
               <TextField
                 select
                 fullWidth
@@ -365,6 +401,7 @@ export default function InvestmentCalculator() {
                 value={currency}
                 onChange={(event) => setCurrency(event.target.value)}
                 variant="outlined"
+                size="small"
               >
                 {currencies.map((item) => (
                   <MenuItem key={item.value} value={item.value}>
@@ -373,23 +410,44 @@ export default function InvestmentCalculator() {
                 ))}
               </TextField>
             </Grid>
-
-            <Grid size={{ xs: 12, md: 5 }}>
+            <Grid size={{ xs: 12, sm: 8, md: 5 }}>
               <TextField
-                label="Total to Invest"
+                className="no-spinners"
+                label="Amount to Invest"
                 fullWidth
                 type="number"
+                size="small"
                 error={Boolean(errors.amount)}
                 helperText={errors.amount ? errors.amount.message : ""}
-                inputProps={{ step: 100 }}
-                {...register("amount", { valueAsNumber: true })}
+                inputProps={{ step: 500, min: 1000, max: 10_00_000 }}
+                onKeyDown={(e) => {
+                  if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+                }}
+                {...register("amount", {
+                  valueAsNumber: true,
+                  onChange: (e) => {
+                    const val = e.target.value;
+                    if (val === "") return;
+                    const num = Number(val);
+                    if (num > 10_00_000) {
+                      setValue("amount", 10_00_000);
+                    }
+                  },
+                  onBlur: (e) => {
+                    const val = e.target.value;
+                    const num = Number(val);
+                    if (!val || num < 1000) {
+                      setValue("amount", 1000);
+                    }
+                  },
+                })}
                 variant="outlined"
               />
             </Grid>
 
             <Grid size={{ xs: 12, md: 4 }}>
-              <FormControl fullWidth>
-                <InputLabel>Target Buckets</InputLabel>
+              <FormControl fullWidth size="small">
+                <InputLabel>Buckets</InputLabel>
                 <Select
                   multiple
                   value={selectedCategoryIds}
@@ -400,7 +458,7 @@ export default function InvestmentCalculator() {
                         : event.target.value,
                     )
                   }
-                  input={<OutlinedInput label="Target Buckets" />}
+                  input={<OutlinedInput label="Buckets" />}
                   renderValue={(selected) => {
                     if (selected.length === metadata?.categories.length) {
                       return "All categories";
@@ -426,39 +484,6 @@ export default function InvestmentCalculator() {
             </Grid>
 
             <Grid size={{ xs: 12 }}>
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
-                <Button
-                  disabled={isSubmitting || !selectedCategoryIds.length}
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  size="large"
-                  startIcon={!isSubmitting ? <TuneRoundedIcon /> : undefined}
-                  sx={{ py: 1.5, fontSize: "1.05rem" }}
-                >
-                  {isSubmitting ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    "Calculate Allocation"
-                  )}
-                </Button>
-                <Chip
-                  icon={<InsightsRoundedIcon />}
-                  label={`${selectedCategoryIds.length} bucket${
-                    selectedCategoryIds.length === 1 ? "" : "s"
-                  } selected`}
-                  color="primary"
-                  variant="outlined"
-                  sx={{
-                    height: 48,
-                    borderRadius: 999,
-                    alignSelf: { xs: "stretch", sm: "center" },
-                    justifyContent: "center",
-                  }}
-                />
-              </Stack>
-            </Grid>
-            <Grid size={{ xs: 12 }}>
               <FormControlLabel
                 control={
                   <Switch
@@ -466,15 +491,21 @@ export default function InvestmentCalculator() {
                     onChange={(event) =>
                       setRoundOffEnabled(event.target.checked)
                     }
+                    size="small"
                   />
                 }
-                label="Round off allocations (nearest 100) while preserving total"
+                label={
+                  <Typography variant="body2" color="text.secondary">
+                    Round to nearest ₹100
+                  </Typography>
+                }
               />
             </Grid>
           </Grid>
         </form>
       </Paper>
 
+      {/* Results */}
       {Object.keys(groupedResults).length ? (
         <Box
           component={motion.div}
@@ -484,7 +515,7 @@ export default function InvestmentCalculator() {
             hidden: { opacity: 0 },
             visible: {
               opacity: 1,
-              transition: { staggerChildren: 0.1 },
+              transition: { staggerChildren: 0.08 },
             },
           }}
         >
@@ -492,128 +523,158 @@ export default function InvestmentCalculator() {
             direction="row"
             justifyContent="space-between"
             alignItems="center"
-            mb={2.5}
-            gap={1.5}
+            mb={2}
+            gap={1}
             flexWrap="wrap"
           >
-            <Stack direction="row" spacing={1.25} alignItems="center">
-              <Typography variant="h5">Optimization Results</Typography>
-              <Chip
-                size="small"
-                label={`${displayedResults.length} recommendations`}
-                color="primary"
-                variant="outlined"
-              />
+            <Stack direction="row" spacing={1} alignItems="baseline">
+              <Typography variant="h6">Results</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {currencyMeta.symbol}
+                {totalAllocated.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })}
+              </Typography>
             </Stack>
 
-            <Stack direction="row" spacing={1}>
-              <Chip
-                size="small"
-                label={`Total ${currencyMeta.symbol}${totalAllocated.toLocaleString(
-                  undefined,
-                  { maximumFractionDigits: 2 },
-                )}`}
-              />
-              <Button
-                startIcon={<ContentCopyIcon />}
-                onClick={handleCopyAll}
-                variant="text"
-                color="primary"
-              >
-                Copy results
-              </Button>
-            </Stack>
+            <Button
+              startIcon={
+                <ContentCopyIcon sx={{ fontSize: "16px !important" }} />
+              }
+              onClick={handleCopyAll}
+              variant="text"
+              size="small"
+              sx={{ color: "text.secondary" }}
+            >
+              Copy
+            </Button>
           </Stack>
 
-          <Stack spacing={4}>
-            {Object.entries(groupedResults).map(([categoryName, results]) => (
-              <Paper key={categoryName} sx={{ p: 2.5, borderRadius: 4 }}>
-                <Stack
-                  direction={{ xs: "column", sm: "row" }}
-                  justifyContent="space-between"
-                  alignItems={{ xs: "flex-start", sm: "center" }}
-                  spacing={1}
-                  mb={2}
-                >
-                  <Typography
-                    variant="subtitle2"
+          <Stack spacing={2}>
+            {Object.entries(groupedResults).map(
+              ([categoryName, results], groupIndex) => {
+                const accent =
+                  categoryAccents[groupIndex % categoryAccents.length];
+
+                return (
+                  <Paper
+                    key={categoryName}
                     sx={{
-                      textTransform: "uppercase",
-                      letterSpacing: "0.1em",
-                      color: "primary.main",
-                      fontWeight: 800,
+                      p: 2.5,
+                      borderLeft: (theme) =>
+                        `3px solid ${theme.palette.mode === "dark" ? accent.dark : accent.light}`,
                     }}
                   >
-                    {categoryName}
-                  </Typography>
-                  <Chip
-                    size="small"
-                    label={`${results.length} instrument${
-                      results.length === 1 ? "" : "s"
-                    }`}
-                  />
-                </Stack>
-
-                <Grid container spacing={2}>
-                  {results.map((allocation) => (
-                    <Grid
-                      key={`${allocation.instrumentId}-${allocation.categoryId}`}
-                      size={{ xs: 12, md: 6, lg: 4 }}
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      mb={2}
                     >
-                      <Paper
-                        component={motion.div}
-                        variants={{
-                          hidden: { opacity: 0, y: 10 },
-                          visible: { opacity: 1, y: 0 },
-                        }}
-                        whileHover={{
-                          y: -4,
-                          boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
-                        }}
+                      <Typography
+                        variant="subtitle2"
                         sx={{
-                          p: 3,
-                          height: "100%",
-                          transition: "box-shadow 0.2s ease-in-out",
-                          borderRadius: 3,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.08em",
+                          color: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? accent.dark
+                              : accent.light,
+                          fontWeight: 700,
+                          fontSize: "0.7rem",
                         }}
                       >
-                        <Typography
-                          variant="overline"
-                          color="text.secondary"
-                          sx={{ letterSpacing: "0.08em" }}
+                        {categoryName}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontWeight: 500 }}
+                      >
+                        {results.length}{" "}
+                        {results.length === 1 ? "instrument" : "instruments"}
+                      </Typography>
+                    </Stack>
+
+                    <Grid container spacing={1.5}>
+                      {results.map((allocation) => (
+                        <Grid
+                          key={`${allocation.instrumentId}-${allocation.categoryId}`}
+                          size={{ xs: 12, sm: 6, lg: 4 }}
                         >
-                          Allocation
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {allocation.instrumentType}
-                        </Typography>
-                        <Typography
-                          variant="h4"
-                          sx={{ mt: 1, fontWeight: 700 }}
-                        >
-                          {currencyMeta.symbol}
-                          {allocation.allocatedAmount.toLocaleString(
-                            undefined,
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            },
-                          )}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {(totalAllocated
-                            ? (allocation.allocatedAmount / totalAllocated) *
-                              100
-                            : 0
-                          ).toFixed(2)}
-                          % of optimized total
-                        </Typography>
-                      </Paper>
+                          <Box
+                            component={motion.div}
+                            variants={{
+                              hidden: { opacity: 0, y: 8 },
+                              visible: { opacity: 1, y: 0 },
+                            }}
+                            sx={{
+                              p: 2,
+                              borderRadius: 2,
+                              border: "1px solid",
+                              borderColor: "divider",
+                              transition: "all 0.2s ease",
+                              "&:hover": {
+                                borderColor: (theme) =>
+                                  theme.palette.mode === "dark"
+                                    ? accent.dark
+                                    : accent.light,
+                                transform: "translateY(-2px)",
+                                boxShadow: (theme) =>
+                                  `0 6px 20px ${alpha(
+                                    theme.palette.mode === "dark"
+                                      ? accent.dark
+                                      : accent.light,
+                                    0.08,
+                                  )}`,
+                              },
+                            }}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{
+                                fontWeight: 500,
+                                display: "block",
+                                mb: 0.5,
+                              }}
+                            >
+                              {allocation.instrumentType}
+                            </Typography>
+                            <Typography
+                              variant="h5"
+                              sx={{ fontWeight: 700, mb: 0.25 }}
+                            >
+                              {currencyMeta.symbol}
+                              {allocation.allocatedAmount.toLocaleString(
+                                undefined,
+                                {
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 2,
+                                },
+                              )}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ opacity: 0.6 }}
+                            >
+                              {(totalAllocated
+                                ? (allocation.allocatedAmount /
+                                    totalAllocated) *
+                                  100
+                                : 0
+                              ).toFixed(1)}
+                              %
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      ))}
                     </Grid>
-                  ))}
-                </Grid>
-              </Paper>
-            ))}
+                  </Paper>
+                );
+              },
+            )}
           </Stack>
         </Box>
       ) : (
@@ -621,24 +682,27 @@ export default function InvestmentCalculator() {
           <Box
             sx={{
               textAlign: "center",
-              py: 8,
+              py: 6,
               px: { xs: 2, md: 4 },
+              borderRadius: 2,
               border: "1px dashed",
               borderColor: "divider",
-              borderRadius: 4,
-              background: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "rgba(148,163,184,0.06)"
-                  : "rgba(99,102,241,0.03)",
             }}
           >
-            <AutoAwesomeIcon sx={{ color: "primary.main", mb: 1 }} />
-            <Typography variant="h6" sx={{ mb: 0.5 }}>
-              Ready to generate an allocation
-            </Typography>
-            <Typography color="text.secondary">
-              Choose your amount and target buckets, then run the allocation
-              engine.
+            <TuneRoundedIcon
+              sx={{
+                color: "text.secondary",
+                mb: 1,
+                opacity: 0.3,
+                fontSize: 32,
+              }}
+            />
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ fontWeight: 500 }}
+            >
+              Enter an amount to see allocation
             </Typography>
           </Box>
         )

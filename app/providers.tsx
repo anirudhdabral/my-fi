@@ -14,57 +14,83 @@ const getDesignTokens = (mode: PaletteMode) => ({
   palette: {
     mode,
     primary: {
-      main: mode === "dark" ? "#818cf8" : "#6366f1", // More vibrant in dark mode
-      light: "#a5b4fc",
-      dark: "#4f46e5",
+      main: mode === "dark" ? "#c4b5fd" : "#7c3aed",
+      light: "#ddd6fe",
+      dark: "#6d28d9",
     },
     secondary: {
-      main: mode === "dark" ? "#94a3b8" : "#64748b",
+      main: mode === "dark" ? "#fbbf24" : "#d97706",
+      light: "#fde68a",
+      dark: "#b45309",
     },
     background: {
-      default: mode === "dark" ? "#0b0e14" : "#f8fafc", // Deep charcoal/blue
-      paper: mode === "dark" ? "#11141b" : "#ffffff", // Slightly lighter for contrast
+      default: mode === "dark" ? "#0a0a0f" : "#fafaf9",
+      paper: mode === "dark" ? "#12121a" : "#ffffff",
     },
     text: {
-      primary: mode === "dark" ? "#f8fafc" : "#0f172a",
-      secondary: mode === "dark" ? "#94a3b8" : "#475569",
+      primary: mode === "dark" ? "#e4e4e7" : "#18181b",
+      secondary: mode === "dark" ? "#71717a" : "#71717a",
     },
-    divider: mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)",
+    divider: mode === "dark" ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)",
+    error: {
+      main: mode === "dark" ? "#fca5a5" : "#dc2626",
+    },
+    warning: {
+      main: mode === "dark" ? "#fcd34d" : "#d97706",
+    },
+    success: {
+      main: mode === "dark" ? "#86efac" : "#16a34a",
+    },
   },
   typography: {
-    fontFamily: "var(--font-roboto), var(--font-sans), Inter, sans-serif",
-    h1: { fontWeight: 900, letterSpacing: "-0.03em" },
-    h2: { fontWeight: 900, letterSpacing: "-0.03em" },
-    h3: { fontWeight: 700, letterSpacing: "-0.02em" },
-    h4: { fontWeight: 700, letterSpacing: "-0.015em" },
-    h5: { fontWeight: 700, letterSpacing: "-0.01em" },
-    h6: { fontWeight: 700 },
-    subtitle1: { letterSpacing: "0.01em", fontWeight: 500 },
-    body1: { fontSize: "1rem", lineHeight: 1.6 },
-    body2: { fontSize: "0.875rem", lineHeight: 1.6 },
+    fontFamily: '"Inter", var(--font-sans), system-ui, sans-serif',
+    h1: { fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.1 },
+    h2: { fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.15 },
+    h3: { fontWeight: 700, letterSpacing: "-0.025em", lineHeight: 1.2 },
+    h4: { fontWeight: 700, letterSpacing: "-0.02em" },
+    h5: { fontWeight: 700, letterSpacing: "-0.015em" },
+    h6: { fontWeight: 600, letterSpacing: "-0.01em" },
+    subtitle1: { fontWeight: 500, lineHeight: 1.5 },
+    subtitle2: { fontWeight: 600, lineHeight: 1.5 },
+    body1: { fontSize: "0.9375rem", lineHeight: 1.65 },
+    body2: { fontSize: "0.8125rem", lineHeight: 1.6 },
     button: {
       textTransform: "none" as const,
-      fontWeight: 700,
-      letterSpacing: "0.02em",
+      fontWeight: 600,
+      letterSpacing: "0.01em",
     },
+    caption: { fontSize: "0.75rem", lineHeight: 1.5 },
   },
   shape: {
-    borderRadius: 1, // Use 1px as unit for predictability
+    borderRadius: 8,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 5, // 5px radius for buttons
-          padding: "8px 20px",
+          borderRadius: 8,
+          padding: "9px 22px",
+          fontWeight: 600,
           transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-          fontWeight: 700,
         },
         contained: {
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          boxShadow: "none",
           "&:hover": {
+            boxShadow:
+              mode === "dark"
+                ? "0 4px 16px rgba(196,181,253,0.12)"
+                : "0 4px 16px rgba(124,58,237,0.2)",
             transform: "translateY(-1px)",
-            boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+          },
+          "&:active": {
+            transform: "translateY(0)",
+          },
+        },
+        outlined: {
+          borderWidth: "1.5px",
+          "&:hover": {
+            borderWidth: "1.5px",
+            transform: "translateY(-1px)",
           },
         },
       },
@@ -72,16 +98,57 @@ const getDesignTokens = (mode: PaletteMode) => ({
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 4, // 4px radius for divs/blocks
+          borderRadius: 10,
           backgroundImage: "none",
           border:
             mode === "dark"
               ? "1px solid rgba(255,255,255,0.06)"
-              : "1px solid rgba(0,0,0,0.06)",
+              : "1px solid rgba(0,0,0,0.05)",
           boxShadow:
             mode === "dark"
-              ? "0 4px 20px rgba(0,0,0,0.4)"
-              : "0 2px 12px rgba(0,0,0,0.04)",
+              ? "0 1px 4px rgba(0,0,0,0.4)"
+              : "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiOutlinedInput-root": {
+            borderRadius: 8,
+            transition: "all 0.2s ease",
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: mode === "dark" ? "#c4b5fd" : "#7c3aed",
+            },
+          },
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 6,
+          fontWeight: 600,
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: "none" as const,
+          fontWeight: 600,
+        },
+      },
+    },
+    MuiSwitch: {
+      styleOverrides: {
+        root: {
+          "& .MuiSwitch-switchBase.Mui-checked": {
+            color: mode === "dark" ? "#c4b5fd" : "#7c3aed",
+          },
+          "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+            backgroundColor: mode === "dark" ? "#c4b5fd" : "#7c3aed",
+          },
         },
       },
     },
@@ -96,7 +163,6 @@ function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
     () => false,
   );
 
-  // Keep server and hydration render aligned (light), then switch after hydrate.
   const mode = (
     isHydrated && resolvedTheme === "dark" ? "dark" : "light"
   ) as PaletteMode;

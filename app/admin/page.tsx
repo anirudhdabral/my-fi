@@ -211,7 +211,7 @@ export default function AdminPage() {
       categoryForm.reset({
         categories: payload.categories.map((c) => ({ ...c, id: c._id })),
       });
-      showToast("Category targets updated", "success");
+      showToast("Categories updated", "success");
     } catch (error) {
       showToast((error as Error).message, "error");
     }
@@ -237,7 +237,7 @@ export default function AdminPage() {
           categoryId: i.categoryId?.toString() ?? "",
         })),
       });
-      showToast("Instrument targets saved", "success");
+      showToast("Instruments saved", "success");
     } catch (error) {
       showToast((error as Error).message, "error");
     }
@@ -293,184 +293,136 @@ export default function AdminPage() {
 
   if (status === "loading" || isLoadingData) {
     return (
-      <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Stack spacing={4}>
-          <Box>
-            <Skeleton
-              variant="rectangular"
-              width={300}
-              height={48}
-              sx={{ mb: 1, borderRadius: 1 }}
-            />
-            <Skeleton
-              variant="rectangular"
-              width={500}
-              height={24}
-              sx={{ borderRadius: 1 }}
-            />
-          </Box>
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <Stack direction="row" spacing={4}>
-              <Skeleton
-                variant="rectangular"
-                width={150}
-                height={40}
-                sx={{ borderRadius: "4px 4px 0 0" }}
-              />
-              <Skeleton
-                variant="rectangular"
-                width={150}
-                height={40}
-                sx={{ borderRadius: "4px 4px 0 0" }}
-              />
-            </Stack>
-          </Box>
-          <Paper sx={{ p: 5, borderRadius: 1 }}>
-            <Stack spacing={4}>
-              <Box>
-                <Skeleton variant="text" width="60%" height={32} />
-                <Skeleton variant="text" width="40%" height={24} />
-              </Box>
-              <Stack spacing={2}>
-                {[1, 2].map((i) => (
-                  <Skeleton
-                    key={i}
-                    variant="rectangular"
-                    width="100%"
-                    height={80}
-                    sx={{ borderRadius: 1 }}
-                  />
-                ))}
-              </Stack>
-            </Stack>
-          </Paper>
-          <Paper sx={{ p: 5, borderRadius: 1 }}>
-            <Stack spacing={4}>
-              <Box>
-                <Skeleton variant="text" width="50%" height={32} />
-                <Skeleton variant="text" width="30%" height={24} />
-              </Box>
-              <Stack spacing={2}>
-                {[1, 2, 3].map((i) => (
-                  <Skeleton
-                    key={i}
-                    variant="rectangular"
-                    width="100%"
-                    height={80}
-                    sx={{ borderRadius: 1 }}
-                  />
-                ))}
-              </Stack>
-            </Stack>
-          </Paper>
+      <Container maxWidth="md" sx={{ py: 6 }}>
+        <Stack spacing={3}>
+          <Skeleton
+            variant="rectangular"
+            width={200}
+            height={36}
+            sx={{ borderRadius: 2 }}
+          />
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={48}
+            sx={{ borderRadius: 2 }}
+          />
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={300}
+            sx={{ borderRadius: 3 }}
+          />
         </Stack>
       </Container>
     );
   }
 
-  return (
-    <Container maxWidth="lg" sx={{ py: 6 }}>
-      <Stack spacing={1} mb={6}>
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-        >
-          <Typography variant="h3" fontWeight={800}>
-            Admin
-          </Typography>
-          <Typography color="text.secondary" variant="h6" fontWeight={400}>
-            Control center for your financial portfolio and user access.
-          </Typography>
-        </motion.div>
-      </Stack>
+  const isAllocationValid = Math.abs(currentCategorySum - 100) < 0.1;
 
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 4 }}>
+  return (
+    <Container maxWidth="md" sx={{ py: { xs: 4, md: 6 } }}>
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <Typography variant="h4" fontWeight={800} sx={{ mb: 0.5 }}>
+          Admin
+        </Typography>
+        <Typography color="text.secondary" variant="body2" sx={{ mb: 4 }}>
+          Manage portfolio configuration and user access.
+        </Typography>
+      </motion.div>
+
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
         <Tabs
           value={activeTab}
           onChange={(_, val) => setActiveTab(val)}
           sx={{
             "& .MuiTab-root": {
-              minHeight: 64,
-              fontSize: "1rem",
+              minHeight: 52,
+              fontSize: "0.875rem",
               fontWeight: 600,
             },
           }}
         >
           <Tab
-            icon={<SettingsIcon />}
+            icon={<SettingsIcon sx={{ fontSize: 18 }} />}
             iconPosition="start"
-            label="Investment Config"
+            label="Config"
           />
-          <Tab icon={<PeopleIcon />} iconPosition="start" label="User Access" />
+          <Tab
+            icon={<PeopleIcon sx={{ fontSize: 18 }} />}
+            iconPosition="start"
+            label="Users"
+          />
         </Tabs>
       </Box>
 
       {activeTab === 0 && (
-        <Stack spacing={4}>
+        <Stack spacing={3}>
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Paper sx={{ p: { xs: 3, md: 5 } }}>
-              <Stack spacing={4}>
+            <Paper sx={{ p: { xs: 3, md: 4 } }}>
+              <Stack spacing={3}>
                 <Box>
-                  <Typography variant="h5" mb={1} fontWeight={700}>
-                    Category Allocation Targets
+                  <Typography variant="h6" fontWeight={700} sx={{ mb: 0.5 }}>
+                    Categories
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" mb={3}>
-                    Define the high-level distribution across your asset
-                    classes. Must total exactly 100%.
+                  <Typography variant="body2" color="text.secondary">
+                    Asset class distribution. Must total 100%.
                   </Typography>
-                  <Box sx={{ mt: 2 }}>
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      mb={1}
+                </Box>
+
+                {/* Progress bar */}
+                <Box>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={0.75}
+                  >
+                    <Typography
+                      variant="caption"
+                      fontWeight={600}
+                      color="text.secondary"
                     >
-                      <Typography
-                        variant="body2"
-                        fontWeight={600}
-                        color="text.secondary"
-                      >
-                        Overall Allocation Progress
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        fontWeight={700}
-                        color={
-                          Math.abs(currentCategorySum - 100) < 0.1
-                            ? "success.main"
-                            : "warning.main"
-                        }
-                      >
-                        {currentCategorySum.toFixed(1)}% / 100%
-                      </Typography>
-                    </Stack>
-                    <Box
-                      sx={{
-                        width: "100%",
-                        height: 8,
-                        bgcolor: (theme) => alpha(theme.palette.divider, 0.1),
-                        borderRadius: 2,
-                        overflow: "hidden",
+                      Allocation
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      fontWeight={700}
+                      color={
+                        isAllocationValid ? "success.main" : "warning.main"
+                      }
+                    >
+                      {currentCategorySum.toFixed(1)}%
+                    </Typography>
+                  </Stack>
+                  <Box
+                    sx={{
+                      width: "100%",
+                      height: 4,
+                      bgcolor: (theme) => alpha(theme.palette.divider, 0.1),
+                      borderRadius: 2,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{
+                        width: `${Math.min(currentCategorySum, 100)}%`,
                       }}
-                    >
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{
-                          width: `${Math.min(currentCategorySum, 100)}%`,
-                        }}
-                        style={{
-                          height: "100%",
-                          backgroundColor:
-                            Math.abs(currentCategorySum - 100) < 0.1
-                              ? "#10b981"
-                              : "#f59e0b",
-                          borderRadius: 2,
-                        }}
-                      />
-                    </Box>
+                      style={{
+                        height: "100%",
+                        backgroundColor: isAllocationValid
+                          ? "#34d399"
+                          : "#fbbf24",
+                        borderRadius: 2,
+                      }}
+                    />
                   </Box>
                 </Box>
 
@@ -479,10 +431,10 @@ export default function AdminPage() {
                     <Box
                       key={field.id}
                       sx={{
-                        p: 2.5,
-                        borderRadius: 1,
+                        p: 2,
+                        borderRadius: 2.5,
                         bgcolor: (theme) =>
-                          alpha(theme.palette.action.hover, 0.04),
+                          alpha(theme.palette.action.hover, 0.03),
                         border: "1px solid",
                         borderColor: "divider",
                         transition: "all 0.2s",
@@ -490,24 +442,22 @@ export default function AdminPage() {
                           borderColor: "primary.main",
                           bgcolor: (theme) =>
                             alpha(theme.palette.primary.main, 0.02),
-                          transform: "translateY(-1px)",
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                         },
                       }}
                     >
-                      <Grid container spacing={3} alignItems="center">
+                      <Grid container spacing={2} alignItems="center">
                         <Grid size={{ xs: 12, md: 6 }}>
                           <TextField
-                            label="Asset Class Name"
+                            label="Name"
                             fullWidth
                             variant="standard"
-                            placeholder="e.g. Stocks, Gold, Debt"
+                            placeholder="e.g. Stocks, Gold"
                             {...categoryForm.register(
                               `categories.${index}.name` as const,
                             )}
                             InputProps={{
                               disableUnderline: false,
-                              sx: { fontSize: "1.05rem", fontWeight: 600 },
+                              sx: { fontSize: "0.95rem", fontWeight: 600 },
                             }}
                           />
                         </Grid>
@@ -524,17 +474,36 @@ export default function AdminPage() {
                             }}
                             {...categoryForm.register(
                               `categories.${index}.percentage` as const,
+                              {
+                                valueAsNumber: true,
+                                onChange: (e) => {
+                                  const val = e.target.value;
+                                  if (val === "") return;
+                                  const num = Number(val);
+                                  if (num > 100) {
+                                    categoryForm.setValue(
+                                      `categories.${index}.percentage`,
+                                      100,
+                                    );
+                                  } else if (num < 0) {
+                                    categoryForm.setValue(
+                                      `categories.${index}.percentage`,
+                                      0,
+                                    );
+                                  }
+                                },
+                              },
                             )}
                             InputProps={{
                               endAdornment: (
                                 <Typography
-                                  variant="body2"
-                                  sx={{ ml: 1, opacity: 0.5 }}
+                                  variant="caption"
+                                  sx={{ ml: 0.5, opacity: 0.4 }}
                                 >
                                   %
                                 </Typography>
                               ),
-                              sx: { fontSize: "1.05rem", fontWeight: 600 },
+                              sx: { fontSize: "0.95rem", fontWeight: 600 },
                             }}
                           />
                         </Grid>
@@ -543,17 +512,17 @@ export default function AdminPage() {
                           display="flex"
                           justifyContent="flex-end"
                         >
-                          <Tooltip title="Remove Category">
+                          <Tooltip title="Remove">
                             <IconButton
                               color="error"
                               size="small"
                               onClick={() => removeCategory(index)}
                               sx={{
                                 bgcolor: (theme) =>
-                                  alpha(theme.palette.error.main, 0.1),
+                                  alpha(theme.palette.error.main, 0.08),
                                 "&:hover": {
                                   bgcolor: (theme) =>
-                                    alpha(theme.palette.error.main, 0.2),
+                                    alpha(theme.palette.error.main, 0.15),
                                 },
                               }}
                             >
@@ -566,47 +535,24 @@ export default function AdminPage() {
                   ))}
                 </Stack>
 
-                <Divider sx={{ my: 1 }} />
+                <Divider sx={{ opacity: 0.3 }} />
 
-                <Stack
-                  direction={{ xs: "column", sm: "row" }}
-                  spacing={2}
-                  sx={{ mt: 2 }}
-                >
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
                   <Button
                     variant="outlined"
                     startIcon={<AddIcon />}
                     onClick={() => appendCategory({ name: "", percentage: 0 })}
-                    sx={{
-                      flex: 1,
-                      py: 1.5,
-                      borderRadius: 5,
-                      textTransform: "none",
-                      fontWeight: 700,
-                      borderWidth: 2,
-                      "&:hover": { borderWidth: 2 },
-                    }}
+                    sx={{ flex: 1 }}
                   >
-                    Add Asset Class
+                    Add Category
                   </Button>
                   <Button
                     variant="contained"
                     onClick={categoryForm.handleSubmit(onSubmitCategories)}
-                    disabled={
-                      !canSubmitCategories ||
-                      Math.abs(currentCategorySum - 100) > 0.1
-                    }
-                    sx={{
-                      flex: 2,
-                      py: 1.5,
-                      borderRadius: 5,
-                      textTransform: "none",
-                      fontWeight: 700,
-                      boxShadow: (theme) =>
-                        `0 8px 16px ${alpha(theme.palette.primary.main, 0.2)}`,
-                    }}
+                    disabled={!canSubmitCategories || !isAllocationValid}
+                    sx={{ flex: 2 }}
                   >
-                    Save Allocation Targets
+                    Save Categories
                   </Button>
                 </Stack>
               </Stack>
@@ -614,18 +560,18 @@ export default function AdminPage() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.08 }}
           >
-            <Paper sx={{ p: { xs: 3, md: 5 } }}>
-              <Stack spacing={4}>
+            <Paper sx={{ p: { xs: 3, md: 4 } }}>
+              <Stack spacing={3}>
                 <Box>
-                  <Typography variant="h5" mb={1} fontWeight={700}>
-                    Investment Instruments
+                  <Typography variant="h6" fontWeight={700} sx={{ mb: 0.5 }}>
+                    Instruments
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Drill down into specific vehicles within each asset class.
+                    Specific vehicles within each category.
                   </Typography>
                 </Box>
 
@@ -634,10 +580,10 @@ export default function AdminPage() {
                     <Box
                       key={field.id}
                       sx={{
-                        p: 2.5,
-                        borderRadius: 4,
+                        p: 2,
+                        borderRadius: 2.5,
                         bgcolor: (theme) =>
-                          alpha(theme.palette.action.hover, 0.04),
+                          alpha(theme.palette.action.hover, 0.03),
                         border: "1px solid",
                         borderColor: "divider",
                         transition: "all 0.2s",
@@ -645,12 +591,10 @@ export default function AdminPage() {
                           borderColor: "secondary.main",
                           bgcolor: (theme) =>
                             alpha(theme.palette.secondary.main, 0.02),
-                          transform: "translateY(-1px)",
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                         },
                       }}
                     >
-                      <Grid container spacing={3} alignItems="center">
+                      <Grid container spacing={2} alignItems="center">
                         <Grid size={{ xs: 12, md: 4 }}>
                           <TextField
                             label="Instrument"
@@ -662,7 +606,7 @@ export default function AdminPage() {
                             )}
                             InputProps={{
                               disableUnderline: false,
-                              sx: { fontSize: "1rem", fontWeight: 600 },
+                              sx: { fontSize: "0.9rem", fontWeight: 600 },
                             }}
                           />
                         </Grid>
@@ -704,17 +648,36 @@ export default function AdminPage() {
                             }}
                             {...instrumentForm.register(
                               `instruments.${index}.inv_percentage` as const,
+                              {
+                                valueAsNumber: true,
+                                onChange: (e) => {
+                                  const val = e.target.value;
+                                  if (val === "") return;
+                                  const num = Number(val);
+                                  if (num > 100) {
+                                    instrumentForm.setValue(
+                                      `instruments.${index}.inv_percentage`,
+                                      100,
+                                    );
+                                  } else if (num < 0) {
+                                    instrumentForm.setValue(
+                                      `instruments.${index}.inv_percentage`,
+                                      0,
+                                    );
+                                  }
+                                },
+                              },
                             )}
                             InputProps={{
                               endAdornment: (
                                 <Typography
                                   variant="caption"
-                                  sx={{ ml: 0.5, opacity: 0.5 }}
+                                  sx={{ ml: 0.5, opacity: 0.4 }}
                                 >
                                   %
                                 </Typography>
                               ),
-                              sx: { fontSize: "1rem", fontWeight: 600 },
+                              sx: { fontSize: "0.9rem", fontWeight: 600 },
                             }}
                           />
                         </Grid>
@@ -723,17 +686,17 @@ export default function AdminPage() {
                           display="flex"
                           justifyContent="flex-end"
                         >
-                          <Tooltip title="Remove Instrument">
+                          <Tooltip title="Remove">
                             <IconButton
                               color="error"
                               size="small"
                               onClick={() => removeInstrument(index)}
                               sx={{
                                 bgcolor: (theme) =>
-                                  alpha(theme.palette.error.main, 0.1),
+                                  alpha(theme.palette.error.main, 0.08),
                                 "&:hover": {
                                   bgcolor: (theme) =>
-                                    alpha(theme.palette.error.main, 0.2),
+                                    alpha(theme.palette.error.main, 0.15),
                                 },
                               }}
                             >
@@ -746,16 +709,13 @@ export default function AdminPage() {
                   ))}
                 </Stack>
 
-                <Divider sx={{ my: 1 }} />
+                <Divider sx={{ opacity: 0.3 }} />
 
-                <Stack
-                  direction={{ xs: "column", sm: "row" }}
-                  spacing={2}
-                  sx={{ mt: 2 }}
-                >
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
                   <Button
                     variant="outlined"
                     startIcon={<AddIcon />}
+                    color="secondary"
                     onClick={() =>
                       appendInstrument({
                         type: "",
@@ -763,40 +723,16 @@ export default function AdminPage() {
                         inv_percentage: 0,
                       })
                     }
-                    sx={{
-                      flex: 1,
-                      py: 1.5,
-                      borderRadius: 5,
-                      textTransform: "none",
-                      fontWeight: 700,
-                      borderWidth: 2,
-                      borderColor: "secondary.main",
-                      color: "secondary.main",
-                      "&:hover": {
-                        borderWidth: 2,
-                        borderColor: "secondary.dark",
-                        bgcolor: (theme) =>
-                          alpha(theme.palette.secondary.main, 0.05),
-                      },
-                    }}
+                    sx={{ flex: 1 }}
                   >
                     Add Instrument
                   </Button>
                   <Button
                     variant="contained"
+                    color="secondary"
                     onClick={instrumentForm.handleSubmit(onSubmitInstruments)}
                     disabled={!canSubmitInstruments}
-                    sx={{
-                      flex: 2,
-                      py: 1.5,
-                      borderRadius: 5,
-                      textTransform: "none",
-                      fontWeight: 700,
-                      bgcolor: "secondary.main",
-                      boxShadow: (theme) =>
-                        `0 8px 16px ${alpha(theme.palette.secondary.main, 0.2)}`,
-                      "&:hover": { bgcolor: "secondary.dark" },
-                    }}
+                    sx={{ flex: 2 }}
                   >
                     Save Instruments
                   </Button>
@@ -809,42 +745,40 @@ export default function AdminPage() {
 
       {activeTab === 1 && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Paper sx={{ p: { xs: 3, md: 5 } }}>
-            <Stack spacing={4}>
+          <Paper sx={{ p: { xs: 3, md: 4 } }}>
+            <Stack spacing={3}>
               <Stack
-                direction={{ xs: "column", md: "row" }}
+                direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="flex-start"
-                spacing={2}
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                spacing={1.5}
               >
                 <Box>
-                  <Typography variant="h5" fontWeight={700}>
+                  <Typography variant="h6" fontWeight={700}>
                     Users
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Review join requests and manage messaging.
+                    Manage access and broadcast updates.
                   </Typography>
                 </Box>
                 <Button
                   variant="contained"
-                  startIcon={<SendIcon />}
+                  color="secondary"
+                  size="small"
+                  startIcon={<SendIcon sx={{ fontSize: "16px !important" }} />}
                   onClick={handleRebalance}
-                  sx={{
-                    bgcolor: "secondary.main",
-                    "&:hover": { bgcolor: "secondary.dark" },
-                  }}
                 >
-                  Broadcast Rebalance Update
+                  Broadcast Update
                 </Button>
               </Stack>
 
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
                 <TextField
                   size="small"
-                  placeholder="Filter by name or email..."
+                  placeholder="Search users..."
                   sx={{ flexGrow: 1 }}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -854,58 +788,64 @@ export default function AdminPage() {
                     <Switch
                       checked={showOnlyPending}
                       onChange={(e) => setShowOnlyPending(e.target.checked)}
+                      size="small"
                     />
                   }
-                  label="Show pending only"
+                  label={
+                    <Typography variant="body2" color="text.secondary">
+                      Pending only
+                    </Typography>
+                  }
                 />
               </Stack>
 
               <Stack spacing={1}>
                 {filteredUsers.length > 0 ? (
                   filteredUsers.map((user) => (
-                    <Paper
+                    <Box
                       key={user._id}
-                      variant="outlined"
                       sx={{
-                        p: 2.5,
+                        p: 2,
                         display: "flex",
-                        flexDirection: { xs: "column", md: "row" },
+                        flexDirection: { xs: "column", sm: "row" },
                         justifyContent: "space-between",
-                        alignItems: "center",
-                        gap: 2,
+                        alignItems: { xs: "flex-start", sm: "center" },
+                        gap: 1.5,
+                        borderRadius: 2.5,
+                        border: "1px solid",
+                        borderColor: "divider",
                         transition: "all 0.2s",
                         "&:hover": {
-                          borderColor: "primary.main",
-                          bgcolor: "rgba(99, 102, 241, 0.02)",
+                          borderColor: user.approved
+                            ? "success.main"
+                            : "warning.main",
                         },
                       }}
                     >
-                      <Box>
-                        <Typography fontWeight={600}>
-                          {user.name || "Unnamed User"}
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="body2" fontWeight={600} noWrap>
+                          {user.name || "Unnamed"}
                         </Typography>
-                        <Typography color="text.secondary" variant="body2">
+                        <Typography
+                          color="text.secondary"
+                          variant="caption"
+                          noWrap
+                          sx={{ display: "block" }}
+                        >
                           {user.email}
                         </Typography>
                       </Box>
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        {user.approved ? (
-                          <Chip
-                            label="Approved"
-                            color="success"
-                            size="small"
-                            variant="filled"
-                            icon={<CheckCircleIcon />}
-                          />
-                        ) : (
-                          <Chip
-                            label="Pending"
-                            color="warning"
-                            size="small"
-                            variant="filled"
-                            icon={<InfoIcon />}
-                          />
-                        )}
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Chip
+                          label={user.approved ? "Approved" : "Pending"}
+                          color={user.approved ? "success" : "warning"}
+                          size="small"
+                          variant="outlined"
+                          icon={
+                            user.approved ? <CheckCircleIcon /> : <InfoIcon />
+                          }
+                          sx={{ fontWeight: 600 }}
+                        />
                         <Button
                           variant="outlined"
                           size="small"
@@ -915,17 +855,17 @@ export default function AdminPage() {
                               approved: !user.approved,
                             })
                           }
-                          sx={{ minWidth: 140 }}
+                          sx={{ minWidth: 100, fontSize: "0.75rem" }}
                         >
-                          {user.approved ? "Revoke Access" : "Grant Access"}
+                          {user.approved ? "Revoke" : "Approve"}
                         </Button>
                       </Stack>
-                    </Paper>
+                    </Box>
                   ))
                 ) : (
-                  <Box sx={{ py: 6, textAlign: "center" }}>
-                    <Typography color="text.secondary">
-                      No users matched your criteria.
+                  <Box sx={{ py: 5, textAlign: "center" }}>
+                    <Typography variant="body2" color="text.secondary">
+                      No users found.
                     </Typography>
                   </Box>
                 )}
