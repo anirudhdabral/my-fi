@@ -71,6 +71,10 @@ export default function Navbar() {
         borderBottom: "1px solid",
         borderColor: "divider",
         color: "text.primary",
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0,
+        borderBottomLeftRadius: 15,
+        borderBottomRightRadius: 15,
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
