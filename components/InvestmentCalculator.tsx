@@ -153,7 +153,14 @@ function roundAllocationsPreservingTotal(
   }));
 }
 
-export default function InvestmentCalculator() {
+export default function InvestmentCalculator({
+  initialMetadata,
+}: {
+  initialMetadata?: {
+    categories: InvestmentCategory[];
+    instruments: InvestmentInstrument[];
+  } | null;
+}) {
   const { showToast } = useToast();
   const {
     register,
@@ -168,20 +175,20 @@ export default function InvestmentCalculator() {
 
   const watchedAmount = watch("amount");
 
-  const [allocations, setAllocations] = useState<Allocation[] | null>(null);
   const [metadata, setMetadata] = useState<{
     categories: InvestmentCategory[];
     instruments: InvestmentInstrument[];
-  } | null>(null);
+  } | null>(initialMetadata ?? null);
 
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>(
+    initialMetadata?.categories?.map((c) => c._id) ?? [],
+  );
   const [currency, setCurrency] = useState("INR");
   const [roundOffEnabled, setRoundOffEnabled] = useState(true);
-  const [lastRequestedAmount, setLastRequestedAmount] = useState<number | null>(
-    null,
-  );
 
   useEffect(() => {
+    if (initialMetadata) return;
+
     fetch("/api/investments/metadata")
       .then((res) => res.json())
       .then((payload) => {
@@ -194,28 +201,26 @@ export default function InvestmentCalculator() {
         }
       })
       .catch(() => setMetadata(null));
-  }, []);
+  }, [initialMetadata]);
 
   // Real-time calculation logic
-  useEffect(() => {
+  const allocations = useMemo<Allocation[] | null>(() => {
     if (
       !metadata ||
       !watchedAmount ||
       watchedAmount < 1000 ||
       !selectedCategoryIds.length
     ) {
-      setAllocations(null);
-      setLastRequestedAmount(null);
-      return;
+      return null;
     }
 
     try {
       const { categories, instruments } = metadata;
-      let targetCategories = categories.filter((c) =>
+      const targetCategories = categories.filter((c) =>
         selectedCategoryIds.includes(c._id),
       );
 
-      if (!targetCategories.length) return;
+      if (!targetCategories.length) return null;
 
       // Rescale percentages
       const selectionTotal = targetCategories.reduce(
@@ -252,10 +257,10 @@ export default function InvestmentCalculator() {
         }
       }
 
-      setLastRequestedAmount(watchedAmount);
-      setAllocations(newAllocations);
+      return newAllocations;
     } catch (err) {
       console.error("Calculation error:", err);
+      return null;
     }
   }, [watchedAmount, selectedCategoryIds, metadata]);
 
@@ -286,14 +291,14 @@ export default function InvestmentCalculator() {
     }
 
     const targetTotal =
-      lastRequestedAmount ??
+      watchedAmount ||
       categorizedResults.reduce(
         (sum, result) => sum + result.allocatedAmount,
         0,
       );
 
     return roundAllocationsPreservingTotal(categorizedResults, targetTotal);
-  }, [categorizedResults, lastRequestedAmount, roundOffEnabled]);
+  }, [categorizedResults, watchedAmount, roundOffEnabled]);
 
   const groupedResults = useMemo(() => {
     if (!displayedResults.length) {

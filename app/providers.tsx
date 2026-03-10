@@ -155,7 +155,13 @@ const getDesignTokens = (mode: PaletteMode) => ({
   },
 });
 
-function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
+function MuiThemeWrapper({
+  children,
+  initialTheme,
+}: {
+  children: React.ReactNode;
+  initialTheme: PaletteMode;
+}) {
   const { resolvedTheme } = useNextTheme();
   const isHydrated = useSyncExternalStore(
     () => () => undefined,
@@ -164,8 +170,9 @@ function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
   );
 
   const mode = (
-    isHydrated && resolvedTheme === "dark" ? "dark" : "light"
+    isHydrated ? resolvedTheme || initialTheme : initialTheme
   ) as PaletteMode;
+
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
 
   return (
@@ -178,11 +185,21 @@ function MuiThemeWrapper({ children }: { children: React.ReactNode }) {
 
 import { ToastProvider } from "@/lib/toast";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+export default function Providers({
+  children,
+  initialTheme,
+}: {
+  children: React.ReactNode;
+  initialTheme: PaletteMode;
+}) {
   return (
-    <NextThemesProvider attribute="class" defaultTheme="system">
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme={initialTheme}
+      enableSystem={false}
+    >
       <SessionProvider>
-        <MuiThemeWrapper>
+        <MuiThemeWrapper initialTheme={initialTheme}>
           <ToastProvider>{children}</ToastProvider>
         </MuiThemeWrapper>
       </SessionProvider>

@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Box from "@mui/material/Box";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 import Providers from "./providers";
 import InstallPWA from "@/components/InstallPWA";
@@ -37,15 +38,20 @@ export const viewport: Viewport = {
   themeColor: "#7c3aed",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const themeMode = (cookieStore.get("theme")?.value || "light") as
+    | "light"
+    | "dark";
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={themeMode}>
       <body className={inter.variable}>
-        <Providers>
+        <Providers initialTheme={themeMode}>
           <Box
             sx={{
               display: "flex",

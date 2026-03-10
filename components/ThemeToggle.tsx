@@ -21,13 +21,18 @@ export default function ThemeToggle({ variant = "icon" }: ThemeToggleProps) {
 
   const checked = resolvedTheme === "dark";
   const oppositeTheme = checked ? "light" : "dark";
+  const handleThemeChange = () => {
+    const next = oppositeTheme;
+    setTheme(next);
+    document.cookie = `theme=${next}; path=/; max-age=31536000; samesite=lax`;
+  };
 
   if (variant === "switch") {
     return (
       <Switch
         size="small"
         checked={checked}
-        onChange={() => setTheme(oppositeTheme)}
+        onChange={handleThemeChange}
         inputProps={{ "aria-label": "Toggle theme" }}
       />
     );
@@ -37,7 +42,7 @@ export default function ThemeToggle({ variant = "icon" }: ThemeToggleProps) {
     <IconButton
       aria-label="Toggle theme"
       color="inherit"
-      onClick={() => setTheme(oppositeTheme)}
+      onClick={handleThemeChange}
     >
       {icon}
     </IconButton>
