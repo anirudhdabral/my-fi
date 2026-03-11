@@ -14,6 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
 import { useToast } from "@/lib/toast";
+import LoadingScreen from "@/app/loading";
 
 function SignInContent() {
   const { showToast } = useToast();
@@ -69,7 +70,7 @@ function SignInContent() {
   }, [status, router]);
 
   if (status === "loading" || status === "authenticated") {
-    return null;
+    return <LoadingScreen />;
   }
 
   return (
@@ -153,7 +154,7 @@ function SignInContent() {
 
 export default function SignInPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<LoadingScreen />}>
       <SignInContent />
     </Suspense>
   );

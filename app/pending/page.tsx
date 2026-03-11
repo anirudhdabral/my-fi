@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import LoadingScreen from "@/app/loading";
 
 export default function PendingPage() {
   const { data: session, status } = useSession();
@@ -22,7 +23,7 @@ export default function PendingPage() {
   }, [router, session?.user?.approved, status]);
 
   if (status === "loading") {
-    return null;
+    return <LoadingScreen />;
   }
 
   return (

@@ -7,7 +7,6 @@ import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
-import Chip from "@mui/material/Chip";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
@@ -376,31 +375,10 @@ export default function InvestmentCalculator({
           mb: 3,
         }}
       >
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="flex-start"
-          flexWrap="wrap"
-          gap={1}
-          sx={{ mb: 0.5 }}
-        >
-          <Typography variant="h5">Allocation Engine</Typography>
-          <Chip
-            label="Live"
-            size="small"
-            sx={{
-              height: 22,
-              fontSize: "0.65rem",
-              fontWeight: 700,
-              letterSpacing: "0.04em",
-              bgcolor: (theme) => alpha(theme.palette.success.main, 0.1),
-              color: "success.main",
-              border: "1px solid",
-              borderColor: (theme) => alpha(theme.palette.success.main, 0.2),
-            }}
-          />
-        </Stack>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        <Typography variant="h5" sx={{ mb: 0.5 }}>
+          Investment Distributor
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Configure amount and target buckets to generate a weighted split.
         </Typography>
 
@@ -415,7 +393,7 @@ export default function InvestmentCalculator({
             fontSize: "0.7rem",
           }}
         >
-          Not financial advice. Reflects personal portfolio allocations for
+          Not a financial advice. Reflects personal portfolio allocations for
           informational purposes only.
         </Typography>
 

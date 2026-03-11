@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MyFi — Smart Portfolio Allocation",
+  title: "MyFi | Smart Portfolio Allocation",
   description:
     "Calculate optimized investment splits across your asset classes with MyFi's intelligent allocation engine.",
   manifest: "/manifest.json",
