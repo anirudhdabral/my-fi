@@ -37,14 +37,28 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafaf9" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0f" },
-  ],
-  width: "device-width",
-  initialScale: 1,
-};
+// Static viewport removed — replaced by generateViewport() below (reads cookie)
+
+const THEME_COLORS = { light: "#fafaf9", dark: "#0a0a0f" } as const;
+
+export async function generateViewport(): Promise<Viewport> {
+  const cookieStore = await cookies();
+  const themeMode = (cookieStore.get("theme")?.value || "light") as
+    | "light"
+    | "dark";
+
+  return {
+    themeColor: [
+      // Exact match for the user's saved preference — Android PWA picks this up on load
+      { color: THEME_COLORS[themeMode] },
+      // Fallback media-query entries so fresh installs without a cookie still work
+      { media: "(prefers-color-scheme: light)", color: THEME_COLORS.light },
+      { media: "(prefers-color-scheme: dark)", color: THEME_COLORS.dark },
+    ],
+    width: "device-width",
+    initialScale: 1,
+  };
+}
 
 export default async function RootLayout({
   children,

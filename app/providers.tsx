@@ -212,6 +212,7 @@ function MuiThemeWrapper({
 }
 
 import { ToastProvider } from "@/lib/toast";
+import ThemeColorSync from "@/components/ThemeColorSync";
 
 export default function Providers({
   children,
@@ -226,6 +227,7 @@ export default function Providers({
       defaultTheme={initialTheme}
       enableSystem={false}
     >
+      <ThemeColorSync />
       <SessionProvider>
         <MuiThemeWrapper initialTheme={initialTheme}>
           <ToastProvider>{children}</ToastProvider>

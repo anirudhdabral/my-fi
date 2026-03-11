@@ -93,15 +93,7 @@ export default function Navbar() {
             alignItems: "center",
           }}
         >
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={0.75}
-            sx={{
-              transition: "opacity 0.2s ease",
-              "&:hover": { opacity: 0.7 },
-            }}
-          >
+          <Stack direction="row" alignItems="center" spacing={0.75}>
             <Image
               src="/favicon-32x32.png"
               alt="MyFi"

@@ -1,13 +1,13 @@
 {
   "name": "MyFi",
   "short_name": "MyFi",
-  "description": "Investment rebalancing and allocation management.",
+  "description": "Smart portfolio allocation engine.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f8fafc",
-  "theme_color": "#6366f1",
+  "background_color": "#fafaf9",
+  "theme_color": "#7c3aed",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -17,7 +17,8 @@
     {
       "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
