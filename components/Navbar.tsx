@@ -93,38 +93,36 @@ export default function Navbar() {
             alignItems: "center",
           }}
         >
-          <Link href="/" style={{ textDecoration: "none" }}>
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={0.75}
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={0.75}
+            sx={{
+              transition: "opacity 0.2s ease",
+              "&:hover": { opacity: 0.7 },
+            }}
+          >
+            <Image
+              src="/favicon-32x32.png"
+              alt="MyFi"
+              width={20}
+              height={20}
+              style={{ borderRadius: 4 }}
+              unoptimized
+              priority
+            />
+            <Typography
+              variant="subtitle2"
               sx={{
-                transition: "opacity 0.2s ease",
-                "&:hover": { opacity: 0.7 },
+                fontWeight: 700,
+                color: "text.primary",
+                letterSpacing: "-0.02em",
+                fontSize: "0.875rem",
               }}
             >
-              <Image
-                src="/favicon-32x32.png"
-                alt="MyFi"
-                width={20}
-                height={20}
-                style={{ borderRadius: 4 }}
-                unoptimized
-                priority
-              />
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: 700,
-                  color: "text.primary",
-                  letterSpacing: "-0.02em",
-                  fontSize: "0.875rem",
-                }}
-              >
-                MyFi
-              </Typography>
-            </Stack>
-          </Link>
+              MyFi
+            </Typography>
+          </Stack>
 
           <Stack direction="row" spacing={0.5} alignItems="center">
             {!session && <ThemeToggle />}
