@@ -1,6 +1,7 @@
 "use client";
 
 import { useToast } from "@/lib/toast";
+import TextSnippetCarousel from "@/components/TextSnippetCarousel";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
@@ -59,6 +60,11 @@ type Allocation = {
 type AllocationResult = Allocation & {
   categoryName: string;
   instrumentType: string;
+};
+
+type CarouselSnippet = {
+  _id: string;
+  text: string;
 };
 
 const ROUND_OFF_QUANTUM = 100;
@@ -183,6 +189,7 @@ export default function InvestmentCalculator({
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>(
     initialMetadata?.categories?.map((c) => c._id) ?? [],
   );
+  const [snippets, setSnippets] = useState<string[]>([]);
   const [currency, setCurrency] = useState("INR");
   const [roundOffEnabled, setRoundOffEnabled] = useState(true);
 
@@ -202,6 +209,19 @@ export default function InvestmentCalculator({
       })
       .catch(() => setMetadata(null));
   }, [initialMetadata]);
+
+  useEffect(() => {
+    fetch("/api/snippets")
+      .then((res) => res.json())
+      .then((payload) => {
+        const textSnippets =
+          payload?.snippets
+            ?.map((snippet: CarouselSnippet) => snippet.text?.trim())
+            .filter(Boolean) ?? [];
+        setSnippets(textSnippets);
+      })
+      .catch(() => setSnippets([]));
+  }, []);
 
   // Real-time calculation logic
   const allocations = useMemo<Allocation[] | null>(() => {
@@ -364,6 +384,8 @@ export default function InvestmentCalculator({
 
   return (
     <>
+      <TextSnippetCarousel snippets={snippets} />
+
       {/* Input Form */}
       <Paper
         component={motion.div}

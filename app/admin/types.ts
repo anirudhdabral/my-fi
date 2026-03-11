@@ -21,8 +21,22 @@ export const instrumentFormSchema = z.object({
   instruments: z.array(instrumentSchema).min(0),
 });
 
+export const snippetSchema = z.object({
+  id: z.string().optional(),
+  text: z
+    .string()
+    .trim()
+    .min(1, "Snippet text is required")
+    .max(150, "Snippet text can be at most 150 characters"),
+});
+
+export const snippetFormSchema = z.object({
+  snippets: z.array(snippetSchema).max(30),
+});
+
 export type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 export type InstrumentFormValues = z.infer<typeof instrumentFormSchema>;
+export type SnippetFormValues = z.infer<typeof snippetFormSchema>;
 
 export type AdminUser = {
   _id: string;
@@ -49,6 +63,7 @@ export type BootstrapResponse = {
   categories?: CategoryApiItem[];
   instruments?: InstrumentApiItem[];
   users?: AdminUser[];
+  snippets?: SnippetApiItem[];
   error?: string;
 };
 
@@ -59,5 +74,16 @@ export type CategorySaveResponse = {
 
 export type InstrumentSaveResponse = {
   instruments: InstrumentApiItem[];
+  error?: string;
+};
+
+export type SnippetApiItem = {
+  _id: string;
+  text: string;
+  order: number;
+};
+
+export type SnippetSaveResponse = {
+  snippets: SnippetApiItem[];
   error?: string;
 };

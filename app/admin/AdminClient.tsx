@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  Campaign as CampaignIcon,
   ArrowBack as ArrowBackIcon,
   People as PeopleIcon,
   Settings as SettingsIcon,
@@ -23,6 +24,7 @@ import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { useToast } from "@/lib/toast";
 import AdminConfigTab from "./components/AdminConfigTab";
+import AdminSnippetsTab from "./components/AdminSnippetsTab";
 import AdminUsersTab from "./components/AdminUsersTab";
 import {
   type AdminUser,
@@ -33,6 +35,9 @@ import {
   instrumentFormSchema,
   type InstrumentFormValues,
   type InstrumentSaveResponse,
+  snippetFormSchema,
+  type SnippetFormValues,
+  type SnippetSaveResponse,
 } from "./types";
 
 export default function AdminClient() {
@@ -54,6 +59,10 @@ export default function AdminClient() {
     resolver: zodResolver(instrumentFormSchema),
     defaultValues: { instruments: [] },
   });
+  const snippetForm = useForm<SnippetFormValues>({
+    resolver: zodResolver(snippetFormSchema),
+    defaultValues: { snippets: [] },
+  });
 
   const {
     fields: categoryFields,
@@ -72,9 +81,18 @@ export default function AdminClient() {
     name: "instruments",
     control: instrumentForm.control,
   });
+  const {
+    fields: snippetFields,
+    append: appendSnippet,
+    remove: removeSnippet,
+  } = useFieldArray({
+    name: "snippets",
+    control: snippetForm.control,
+  });
 
   const canSubmitCategories = categoryForm.formState.isDirty;
   const canSubmitInstruments = instrumentForm.formState.isDirty;
+  const canSubmitSnippets = snippetForm.formState.isDirty;
 
   const watchedCategories = useWatch({
     control: categoryForm.control,
@@ -113,13 +131,19 @@ export default function AdminClient() {
           categoryId: i.categoryId?.toString() ?? "",
         })),
       });
+      snippetForm.reset({
+        snippets: (payload?.snippets ?? []).map((snippet) => ({
+          id: snippet._id,
+          text: snippet.text,
+        })),
+      });
       setUsers(payload?.users ?? []);
     } catch {
       showToast("Unable to load admin data.", "error");
     } finally {
       setIsLoadingData(false);
     }
-  }, [categoryForm, instrumentForm, showToast]);
+  }, [categoryForm, instrumentForm, showToast, snippetForm]);
 
   useEffect(() => {
     if (status === "loading") {
@@ -216,6 +240,29 @@ export default function AdminClient() {
     }
   };
 
+  const onSubmitSnippets = async (data: SnippetFormValues) => {
+    try {
+      const response = await fetch("/api/admin/snippets", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const payload: SnippetSaveResponse = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Failed to save snippets");
+      }
+      snippetForm.reset({
+        snippets: payload.snippets.map((snippet) => ({
+          id: snippet._id,
+          text: snippet.text,
+        })),
+      });
+      showToast("Snippets updated", "success");
+    } catch (error) {
+      showToast((error as Error).message, "error");
+    }
+  };
+
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -307,6 +354,11 @@ export default function AdminClient() {
             iconPosition="start"
             label="Users"
           />
+          <Tab
+            icon={<CampaignIcon sx={{ fontSize: 18 }} />}
+            iconPosition="start"
+            label="Snippets"
+          />
         </Tabs>
       </Box>
 
@@ -338,6 +390,17 @@ export default function AdminClient() {
           setShowOnlyPending={setShowOnlyPending}
           handleRebalance={handleRebalance}
           handleUserUpdate={handleUserUpdate}
+        />
+      )}
+
+      {activeTab === 2 && (
+        <AdminSnippetsTab
+          snippetForm={snippetForm}
+          snippetFields={snippetFields}
+          appendSnippet={appendSnippet}
+          removeSnippet={removeSnippet}
+          canSubmitSnippets={canSubmitSnippets}
+          onSubmitSnippets={onSubmitSnippets}
         />
       )}
     </Container>

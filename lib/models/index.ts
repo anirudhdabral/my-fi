@@ -7,3 +7,7 @@ export {
   default as InvestmentInstrumentModel,
   type InvestmentInstrumentDocument,
 } from "./InvestmentInstrument";
+export {
+  default as CarouselSnippetModel,
+  type CarouselSnippetDocument,
+} from "./CarouselSnippet";
