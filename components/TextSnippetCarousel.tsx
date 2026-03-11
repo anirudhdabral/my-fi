@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, type PanInfo } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
@@ -68,6 +68,26 @@ export default function TextSnippetCarousel({ snippets }: Props) {
     if (!snippets.length) return;
     setDirection(-1);
     setActiveIndex((prev) => (prev - 1 + snippets.length) % snippets.length);
+  };
+
+  const handleSwipeEnd = (
+    _: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) => {
+    if (isDesktop || snippets.length <= 1) return;
+
+    const swipeDistance = info.offset.x;
+    const swipeVelocity = info.velocity.x;
+    const passedDistance = Math.abs(swipeDistance) > 45;
+    const passedVelocity = Math.abs(swipeVelocity) > 450;
+
+    if (!passedDistance && !passedVelocity) return;
+
+    if (swipeDistance < 0) {
+      goNext();
+      return;
+    }
+    goPrev();
   };
 
   if (!snippets.length) {
@@ -137,10 +157,15 @@ export default function TextSnippetCarousel({ snippets }: Props) {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -16 * direction }}
                   transition={{ duration: 0.25 }}
+                  drag={!isDesktop && snippets.length > 1 ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.18}
+                  onDragEnd={handleSwipeEnd}
                   style={{
                     position: "absolute",
                     inset: 0,
                     zIndex: 2,
+                    touchAction: "pan-y",
                   }}
                 >
                   <Card

@@ -85,6 +85,7 @@ export default function AdminClient() {
     fields: snippetFields,
     append: appendSnippet,
     remove: removeSnippet,
+    move: moveSnippet,
   } = useFieldArray({
     name: "snippets",
     control: snippetForm.control,
@@ -263,6 +264,10 @@ export default function AdminClient() {
     }
   };
 
+  const onReorderSnippets = async (snippets: SnippetFormValues["snippets"]) => {
+    await onSubmitSnippets({ snippets });
+  };
+
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -399,6 +404,8 @@ export default function AdminClient() {
           snippetFields={snippetFields}
           appendSnippet={appendSnippet}
           removeSnippet={removeSnippet}
+          moveSnippet={moveSnippet}
+          onReorderSnippets={onReorderSnippets}
           canSubmitSnippets={canSubmitSnippets}
           onSubmitSnippets={onSubmitSnippets}
         />
