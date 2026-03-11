@@ -7,6 +7,7 @@ import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
@@ -375,9 +376,30 @@ export default function InvestmentCalculator({
           mb: 3,
         }}
       >
-        <Typography variant="h5" sx={{ mb: 0.5 }}>
-          Allocation Engine
-        </Typography>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="flex-start"
+          flexWrap="wrap"
+          gap={1}
+          sx={{ mb: 0.5 }}
+        >
+          <Typography variant="h5">Allocation Engine</Typography>
+          <Chip
+            label="Live"
+            size="small"
+            sx={{
+              height: 22,
+              fontSize: "0.65rem",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              bgcolor: (theme) => alpha(theme.palette.success.main, 0.1),
+              color: "success.main",
+              border: "1px solid",
+              borderColor: (theme) => alpha(theme.palette.success.main, 0.2),
+            }}
+          />
+        </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           Configure amount and target buckets to generate a weighted split.
         </Typography>
@@ -389,7 +411,8 @@ export default function InvestmentCalculator({
             mb: 3,
             color: "warning.main",
             fontWeight: 500,
-            opacity: 0.8,
+            opacity: 0.7,
+            fontSize: "0.7rem",
           }}
         >
           Not financial advice. Reflects personal portfolio allocations for
@@ -520,7 +543,7 @@ export default function InvestmentCalculator({
             hidden: { opacity: 0 },
             visible: {
               opacity: 1,
-              transition: { staggerChildren: 0.08 },
+              transition: { staggerChildren: 0.06 },
             },
           }}
         >
@@ -534,7 +557,14 @@ export default function InvestmentCalculator({
           >
             <Stack direction="row" spacing={1} alignItems="baseline">
               <Typography variant="h6">Results</Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  fontFamily: "var(--font-mono), monospace",
+                  fontWeight: 600,
+                }}
+              >
                 {currencyMeta.symbol}
                 {totalAllocated.toLocaleString(undefined, {
                   maximumFractionDigits: 2,
@@ -544,12 +574,16 @@ export default function InvestmentCalculator({
 
             <Button
               startIcon={
-                <ContentCopyIcon sx={{ fontSize: "16px !important" }} />
+                <ContentCopyIcon sx={{ fontSize: "14px !important" }} />
               }
               onClick={handleCopyAll}
               variant="text"
               size="small"
-              sx={{ color: "text.secondary" }}
+              sx={{
+                color: "text.secondary",
+                fontSize: "0.75rem",
+                "&:hover": { color: "primary.main" },
+              }}
             >
               Copy
             </Button>
@@ -560,14 +594,24 @@ export default function InvestmentCalculator({
               ([categoryName, results], groupIndex) => {
                 const accent =
                   categoryAccents[groupIndex % categoryAccents.length];
+                const categoryTotal = results.reduce(
+                  (sum, r) => sum + r.allocatedAmount,
+                  0,
+                );
 
                 return (
                   <Paper
                     key={categoryName}
+                    component={motion.div}
+                    variants={{
+                      hidden: { opacity: 0, y: 8 },
+                      visible: { opacity: 1, y: 0 },
+                    }}
                     sx={{
                       p: 2.5,
                       borderLeft: (theme) =>
                         `3px solid ${theme.palette.mode === "dark" ? accent.dark : accent.light}`,
+                      overflow: "hidden",
                     }}
                   >
                     <Stack
@@ -576,25 +620,55 @@ export default function InvestmentCalculator({
                       alignItems="center"
                       mb={2}
                     >
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          textTransform: "uppercase",
-                          letterSpacing: "0.08em",
-                          color: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? accent.dark
-                              : accent.light,
-                          fontWeight: 700,
-                          fontSize: "0.7rem",
-                        }}
-                      >
-                        {categoryName}
-                      </Typography>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            textTransform: "uppercase",
+                            letterSpacing: "0.08em",
+                            color: (theme) =>
+                              theme.palette.mode === "dark"
+                                ? accent.dark
+                                : accent.light,
+                            fontWeight: 700,
+                            fontSize: "0.7rem",
+                          }}
+                        >
+                          {categoryName}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: "text.secondary",
+                            fontWeight: 500,
+                            opacity: 0.6,
+                          }}
+                        >
+                          ·
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: "text.secondary",
+                            fontFamily: "var(--font-mono), monospace",
+                            fontWeight: 600,
+                            fontSize: "0.7rem",
+                          }}
+                        >
+                          {currencyMeta.symbol}
+                          {categoryTotal.toLocaleString(undefined, {
+                            maximumFractionDigits: 0,
+                          })}
+                        </Typography>
+                      </Stack>
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        sx={{ fontWeight: 500 }}
+                        sx={{
+                          fontWeight: 500,
+                          opacity: 0.6,
+                          fontSize: "0.68rem",
+                        }}
                       >
                         {results.length}{" "}
                         {results.length === 1 ? "instrument" : "instruments"}
@@ -608,17 +682,14 @@ export default function InvestmentCalculator({
                           size={{ xs: 12, sm: 6, lg: 4 }}
                         >
                           <Box
-                            component={motion.div}
-                            variants={{
-                              hidden: { opacity: 0, y: 8 },
-                              visible: { opacity: 1, y: 0 },
-                            }}
                             sx={{
                               p: 2,
                               borderRadius: 2,
                               border: "1px solid",
                               borderColor: "divider",
                               transition: "all 0.2s ease",
+                              position: "relative",
+                              overflow: "hidden",
                               "&:hover": {
                                 borderColor: (theme) =>
                                   theme.palette.mode === "dark"
@@ -635,20 +706,39 @@ export default function InvestmentCalculator({
                               },
                             }}
                           >
+                            {/* Subtle accent glow */}
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                height: "2px",
+                                background: (theme) =>
+                                  `linear-gradient(90deg, ${theme.palette.mode === "dark" ? accent.dark : accent.light}, transparent)`,
+                                opacity: 0.3,
+                              }}
+                            />
                             <Typography
                               variant="caption"
                               color="text.secondary"
                               sx={{
                                 fontWeight: 500,
                                 display: "block",
-                                mb: 0.5,
+                                mb: 0.75,
+                                fontSize: "0.7rem",
                               }}
                             >
                               {allocation.instrumentType}
                             </Typography>
                             <Typography
                               variant="h5"
-                              sx={{ fontWeight: 700, mb: 0.25 }}
+                              sx={{
+                                fontWeight: 700,
+                                mb: 0.25,
+                                fontFamily: "var(--font-mono), monospace",
+                                fontSize: { xs: "1.25rem", md: "1.35rem" },
+                              }}
                             >
                               {currencyMeta.symbol}
                               {allocation.allocatedAmount.toLocaleString(
@@ -662,7 +752,7 @@ export default function InvestmentCalculator({
                             <Typography
                               variant="caption"
                               color="text.secondary"
-                              sx={{ opacity: 0.6 }}
+                              sx={{ opacity: 0.5, fontSize: "0.68rem" }}
                             >
                               {(totalAllocated
                                 ? (allocation.allocatedAmount /
@@ -685,6 +775,10 @@ export default function InvestmentCalculator({
       ) : (
         metadata && (
           <Box
+            component={motion.div}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
             sx={{
               textAlign: "center",
               py: 6,
@@ -692,13 +786,17 @@ export default function InvestmentCalculator({
               borderRadius: 2,
               border: "1px dashed",
               borderColor: "divider",
+              background: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.01)"
+                  : "rgba(0,0,0,0.01)",
             }}
           >
             <TuneRoundedIcon
               sx={{
                 color: "text.secondary",
                 mb: 1,
-                opacity: 0.3,
+                opacity: 0.2,
                 fontSize: 32,
               }}
             />
@@ -708,6 +806,13 @@ export default function InvestmentCalculator({
               sx={{ fontWeight: 500 }}
             >
               Enter an amount to see allocation
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ opacity: 0.5, mt: 0.5, display: "block" }}
+            >
+              Results update in real-time
             </Typography>
           </Box>
         )

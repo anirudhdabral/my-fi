@@ -11,6 +11,8 @@ const withPWA = withPWAInit({
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   turbopack: {},
+  poweredByHeader: false,
+  compress: true,
   experimental: {
     // Optimize barrel files for better tree-shaking
     optimizePackageImports: [
@@ -18,6 +20,9 @@ const nextConfig: NextConfig = {
       "@mui/icons-material",
       "framer-motion",
     ],
+  },
+  images: {
+    formats: ["image/avif", "image/webp"],
   },
 };
 

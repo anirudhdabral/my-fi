@@ -159,12 +159,14 @@ export default function CalculatorsPage() {
         >
           <IconButton
             onClick={() => router.push("/")}
+            size="small"
             sx={{
               color: "text.secondary",
               "&:hover": {
                 color: "primary.main",
-                bgcolor: alpha("#000", 0.05),
+                bgcolor: (theme) => alpha(theme.palette.primary.main, 0.06),
               },
+              transition: "all 0.2s ease",
             }}
           >
             <ArrowBackIcon />
@@ -187,6 +189,11 @@ export default function CalculatorsPage() {
               minHeight: 48,
               fontSize: "0.875rem",
               fontWeight: 600,
+              transition: "color 0.2s ease",
+            },
+            "& .MuiTabs-indicator": {
+              height: 2.5,
+              borderRadius: "2px 2px 0 0",
             },
           }}
         >
@@ -213,6 +220,7 @@ export default function CalculatorsPage() {
                   justifyContent={"space-between"}
                 >
                   <Typography
+                    variant="body2"
                     color="text.secondary"
                     gutterBottom
                     sx={{ display: "block", mb: 1, fontWeight: 500 }}
@@ -222,7 +230,7 @@ export default function CalculatorsPage() {
                   <Stack direction="row" spacing={2} alignItems="center">
                     <TextField
                       className="no-spinners"
-                      sx={{ width: 100 }}
+                      sx={{ width: 110 }}
                       type="number"
                       size="small"
                       value={amount}
@@ -278,6 +286,7 @@ export default function CalculatorsPage() {
                   justifyContent={"space-between"}
                 >
                   <Typography
+                    variant="body2"
                     color="text.secondary"
                     gutterBottom
                     sx={{ display: "block", mb: 1, fontWeight: 500 }}
@@ -287,7 +296,7 @@ export default function CalculatorsPage() {
                   <Stack direction="row" spacing={2} alignItems="center">
                     <TextField
                       className="no-spinners"
-                      sx={{ width: 100 }}
+                      sx={{ width: 110 }}
                       type="number"
                       size="small"
                       value={rate}
@@ -341,6 +350,7 @@ export default function CalculatorsPage() {
                   justifyContent={"space-between"}
                 >
                   <Typography
+                    variant="body2"
                     color="text.secondary"
                     gutterBottom
                     sx={{ display: "block", mb: 1, fontWeight: 500 }}
@@ -350,7 +360,7 @@ export default function CalculatorsPage() {
                   <Stack direction="row" spacing={2} alignItems="center">
                     <TextField
                       className="no-spinners"
-                      sx={{ width: 100 }}
+                      sx={{ width: 110 }}
                       type="number"
                       size="small"
                       value={years}
@@ -411,7 +421,7 @@ export default function CalculatorsPage() {
                   direction="row"
                   justifyContent="space-between"
                   alignItems="center"
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 2.5 }}
                 >
                   <Typography
                     variant="subtitle2"
@@ -438,10 +448,11 @@ export default function CalculatorsPage() {
                         gap: 0.5,
                         fontWeight: 600,
                         cursor: "default",
+                        fontSize: "0.68rem",
                       }}
                     >
-                      <TrendingUpRoundedIcon sx={{ fontSize: 14 }} />
-                      Annuity Due Mode
+                      <TrendingUpRoundedIcon sx={{ fontSize: 13 }} />
+                      Annuity Due
                     </Typography>
                   )}
                 </Stack>
@@ -451,11 +462,15 @@ export default function CalculatorsPage() {
                     <Typography
                       variant="caption"
                       color="text.secondary"
-                      sx={{ display: "block", mb: 0.25 }}
+                      sx={{ display: "block", mb: 0.5, fontSize: "0.68rem" }}
                     >
                       Invested
                     </Typography>
-                    <Typography variant="body1" fontWeight={700}>
+                    <Typography
+                      variant="body1"
+                      fontWeight={700}
+                      sx={{ fontFamily: "var(--font-mono), monospace" }}
+                    >
                       {fmt(result.invested)}
                     </Typography>
                   </Grid>
@@ -463,7 +478,7 @@ export default function CalculatorsPage() {
                     <Typography
                       variant="caption"
                       color="text.secondary"
-                      sx={{ display: "block", mb: 0.25 }}
+                      sx={{ display: "block", mb: 0.5, fontSize: "0.68rem" }}
                     >
                       Gains
                     </Typography>
@@ -471,6 +486,7 @@ export default function CalculatorsPage() {
                       variant="body1"
                       fontWeight={700}
                       sx={{
+                        fontFamily: "var(--font-mono), monospace",
                         color: (theme: any) =>
                           theme.palette.mode === "dark" ? "#34d399" : "#059669",
                       }}
@@ -482,11 +498,15 @@ export default function CalculatorsPage() {
                     <Typography
                       variant="caption"
                       color="text.secondary"
-                      sx={{ display: "block", mb: 0.25 }}
+                      sx={{ display: "block", mb: 0.5, fontSize: "0.68rem" }}
                     >
                       Total
                     </Typography>
-                    <Typography variant="body1" fontWeight={700}>
+                    <Typography
+                      variant="body1"
+                      fontWeight={700}
+                      sx={{ fontFamily: "var(--font-mono), monospace" }}
+                    >
                       {fmt(result.futureValue)}
                     </Typography>
                   </Grid>
@@ -496,11 +516,11 @@ export default function CalculatorsPage() {
                 <Box
                   sx={{
                     width: "100%",
-                    height: 6,
+                    height: 5,
                     borderRadius: 1,
                     overflow: "hidden",
                     display: "flex",
-                    bgcolor: (theme) => alpha(theme.palette.divider, 0.08),
+                    bgcolor: (theme) => alpha(theme.palette.divider, 0.06),
                   }}
                 >
                   <motion.div
@@ -509,7 +529,7 @@ export default function CalculatorsPage() {
                     transition={{ duration: 0.6, ease: "easeOut" }}
                     style={{
                       height: "100%",
-                      background: "#7c3aed",
+                      background: "linear-gradient(90deg, #7c3aed, #a78bfa)",
                       borderRadius: "4px 0 0 4px",
                     }}
                   />
@@ -519,7 +539,7 @@ export default function CalculatorsPage() {
                     transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
                     style={{
                       height: "100%",
-                      background: "#059669",
+                      background: "linear-gradient(90deg, #059669, #34d399)",
                       borderRadius: "0 4px 4px 0",
                     }}
                   />
@@ -528,26 +548,34 @@ export default function CalculatorsPage() {
                   <Stack direction="row" spacing={0.5} alignItems="center">
                     <Box
                       sx={{
-                        width: 8,
-                        height: 8,
+                        width: 7,
+                        height: 7,
                         borderRadius: "2px",
-                        bgcolor: "#7c3aed",
+                        background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
                       }}
                     />
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ fontSize: "0.68rem" }}
+                    >
                       Invested
                     </Typography>
                   </Stack>
                   <Stack direction="row" spacing={0.5} alignItems="center">
                     <Box
                       sx={{
-                        width: 8,
-                        height: 8,
+                        width: 7,
+                        height: 7,
                         borderRadius: "2px",
-                        bgcolor: "#059669",
+                        background: "linear-gradient(135deg, #059669, #34d399)",
                       }}
                     />
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ fontSize: "0.68rem" }}
+                    >
                       Gains
                     </Typography>
                   </Stack>
@@ -565,11 +593,15 @@ export default function CalculatorsPage() {
                       sx={{ mb: 1.5 }}
                     >
                       <InfoOutlinedIcon
-                        sx={{ fontSize: 16, color: "primary.main" }}
+                        sx={{ fontSize: 15, color: "primary.main" }}
                       />
                       <Typography
                         variant="subtitle2"
-                        sx={{ fontSize: "0.75rem", fontWeight: 700 }}
+                        sx={{
+                          fontSize: "0.7rem",
+                          fontWeight: 700,
+                          letterSpacing: "0.04em",
+                        }}
                       >
                         HOW IT&apos;S CALCULATED
                       </Typography>

@@ -2,7 +2,9 @@
 
 import type { AlertColor } from "@mui/material/Alert";
 import Alert from "@mui/material/Alert";
+import Slide from "@mui/material/Slide";
 import Snackbar from "@mui/material/Snackbar";
+import type { TransitionProps } from "@mui/material/transitions";
 import React, { createContext, useCallback, useContext, useState } from "react";
 
 type ToastContextType = {
@@ -10,6 +12,12 @@ type ToastContextType = {
 };
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
+
+function SlideTransition(
+  props: TransitionProps & { children: React.ReactElement },
+) {
+  return <Slide {...props} direction="up" />;
+}
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -35,9 +43,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {children}
       <Snackbar
         open={open}
-        autoHideDuration={4000}
+        autoHideDuration={3000}
         onClose={handleClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        TransitionComponent={SlideTransition}
         sx={{ mb: 2 }}
       >
         <Alert
@@ -46,8 +55,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           variant="filled"
           sx={{
             width: "100%",
-            borderRadius: 1, // 4px based on my refined theme logic
+            borderRadius: 2,
             fontWeight: 600,
+            fontSize: "0.8125rem",
             boxShadow: (theme) =>
               theme.palette.mode === "dark"
                 ? "0 8px 32px rgba(0,0,0,0.4)"

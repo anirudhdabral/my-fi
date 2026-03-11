@@ -31,7 +31,7 @@ const getDesignTokens = (mode: PaletteMode) => ({
       primary: mode === "dark" ? "#e4e4e7" : "#18181b",
       secondary: mode === "dark" ? "#71717a" : "#71717a",
     },
-    divider: mode === "dark" ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.07)",
+    divider: mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)",
     error: {
       main: mode === "dark" ? "#fca5a5" : "#dc2626",
     },
@@ -65,6 +65,13 @@ const getDesignTokens = (mode: PaletteMode) => ({
     borderRadius: 8,
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          scrollBehavior: "smooth",
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
@@ -79,7 +86,7 @@ const getDesignTokens = (mode: PaletteMode) => ({
             boxShadow:
               mode === "dark"
                 ? "0 4px 16px rgba(196,181,253,0.12)"
-                : "0 4px 16px rgba(124,58,237,0.2)",
+                : "0 4px 16px rgba(124,58,237,0.18)",
             transform: "translateY(-1px)",
           },
           "&:active": {
@@ -102,12 +109,14 @@ const getDesignTokens = (mode: PaletteMode) => ({
           backgroundImage: "none",
           border:
             mode === "dark"
-              ? "1px solid rgba(255,255,255,0.06)"
-              : "1px solid rgba(0,0,0,0.05)",
+              ? "1px solid rgba(255,255,255,0.05)"
+              : "1px solid rgba(0,0,0,0.04)",
           boxShadow:
             mode === "dark"
               ? "0 1px 4px rgba(0,0,0,0.4)"
-              : "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)",
+              : "0 1px 3px rgba(0,0,0,0.03), 0 1px 2px rgba(0,0,0,0.02)",
+          transition:
+            "border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease",
         },
       },
     },
@@ -150,6 +159,25 @@ const getDesignTokens = (mode: PaletteMode) => ({
             backgroundColor: mode === "dark" ? "#c4b5fd" : "#7c3aed",
           },
         },
+      },
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          borderRadius: 6,
+          fontWeight: 500,
+          fontSize: "0.75rem",
+        },
+      },
+    },
+    MuiSkeleton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+      },
+      defaultProps: {
+        animation: "wave" as const,
       },
     },
   },

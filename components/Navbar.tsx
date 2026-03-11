@@ -65,36 +65,49 @@ export default function Navbar() {
       sx={{
         backgroundColor: (theme) =>
           theme.palette.mode === "dark"
-            ? alpha(theme.palette.background.default, 0.8)
-            : alpha("#fafaf9", 0.85),
-        backdropFilter: "blur(16px) saturate(180%)",
+            ? alpha(theme.palette.background.default, 0.7)
+            : alpha("#fafaf9", 0.8),
+        backdropFilter: "blur(20px) saturate(180%)",
+        WebkitBackdropFilter: "blur(20px) saturate(180%)",
         borderBottom: "1px solid",
-        borderColor: "divider",
+        borderColor: (theme) =>
+          theme.palette.mode === "dark"
+            ? "rgba(255,255,255,0.05)"
+            : "rgba(0,0,0,0.04)",
         color: "text.primary",
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
-        borderBottomLeftRadius: 15,
-        borderBottomRightRadius: 15,
+        borderBottomLeftRadius: 14,
+        borderBottomRightRadius: 14,
         zIndex: (theme) => theme.zIndex.drawer + 1,
+        transition: "background-color 0.3s ease, border-color 0.3s ease",
       }}
     >
       <Container maxWidth="md">
         <Toolbar
           disableGutters
           sx={{
-            height: 56,
+            height: 54,
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
           }}
         >
           <Link href="/" style={{ textDecoration: "none" }}>
-            <Stack direction="row" alignItems="center" spacing={0.75}>
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={0.75}
+              sx={{
+                transition: "opacity 0.2s ease",
+                "&:hover": { opacity: 0.7 },
+              }}
+            >
               <Image
                 src="/favicon-32x32.png"
                 alt="MyFi"
-                width={22}
-                height={22}
+                width={20}
+                height={20}
                 style={{ borderRadius: 4 }}
                 unoptimized
                 priority
@@ -105,6 +118,7 @@ export default function Navbar() {
                   fontWeight: 700,
                   color: "text.primary",
                   letterSpacing: "-0.02em",
+                  fontSize: "0.875rem",
                 }}
               >
                 MyFi
@@ -133,7 +147,7 @@ export default function Navbar() {
                   <Avatar
                     alt={session.user?.name || ""}
                     src={session.user?.image || ""}
-                    sx={{ width: 28, height: 28, borderRadius: "100%" }}
+                    sx={{ width: 26, height: 26, borderRadius: "100%" }}
                     variant="rounded"
                   />
                 </IconButton>
@@ -142,24 +156,26 @@ export default function Navbar() {
                   id="account-menu"
                   open={Boolean(anchorEl)}
                   onClose={handleCloseUserMenu}
-                  PaperProps={{
-                    elevation: 0,
-                    sx: {
-                      mt: 1.5,
-                      borderRadius: 2.5,
-                      minWidth: 240,
-                      border: "1px solid",
-                      borderColor: "divider",
-                      overflow: "hidden",
-                      bgcolor: "background.paper",
-                      boxShadow: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? "0 12px 40px rgba(0,0,0,0.5)"
-                          : "0 12px 40px rgba(0,0,0,0.08)",
-                      "& .MuiMenuItem-root": {
-                        px: 1.5,
-                        py: 0.75,
-                        fontSize: "0.8125rem",
+                  slotProps={{
+                    paper: {
+                      elevation: 0,
+                      sx: {
+                        mt: 1.5,
+                        borderRadius: 2.5,
+                        minWidth: 240,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        overflow: "hidden",
+                        bgcolor: "background.paper",
+                        boxShadow: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? "0 16px 48px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3)"
+                            : "0 16px 48px rgba(0,0,0,0.06), 0 4px 8px rgba(0,0,0,0.04)",
+                        "& .MuiMenuItem-root": {
+                          px: 1.5,
+                          py: 0.75,
+                          fontSize: "0.8125rem",
+                        },
                       },
                     },
                   }}

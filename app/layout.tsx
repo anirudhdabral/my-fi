@@ -10,12 +10,15 @@ import InstallPWA from "@/components/InstallPWA";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
-  title: "MyFi",
-  description: "Smart portfolio allocation engine",
+  title: "MyFi — Smart Portfolio Allocation",
+  description:
+    "Calculate optimized investment splits across your asset classes with MyFi's intelligent allocation engine.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -35,7 +38,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#7c3aed",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafaf9" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0f" },
+  ],
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default async function RootLayout({
