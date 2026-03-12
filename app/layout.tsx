@@ -1,11 +1,14 @@
 import Navbar from "@/components/Navbar";
 import Box from "@mui/material/Box";
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Geist } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
 import Providers from "./providers";
 import InstallPWA from "@/components/InstallPWA";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const inter = Inter({
   variable: "--font-inter",
@@ -71,7 +74,7 @@ export default async function RootLayout({
     | "dark";
 
   return (
-    <html lang="en" suppressHydrationWarning className={themeMode}>
+    <html lang="en" suppressHydrationWarning className={cn(themeMode, "font-sans", geist.variable)}>
       <body className={inter.variable}>
         <Providers initialTheme={themeMode}>
           <Box
