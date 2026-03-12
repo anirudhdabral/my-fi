@@ -1,18 +1,18 @@
 "use client";
 
-import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import IconButton from "@mui/material/IconButton";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { AnimatePresence, motion, type PanInfo } from "framer-motion";
-import { useEffect, useState } from "react";
-import { useTheme } from "@mui/material/styles";
 import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import { useTheme } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { AnimatePresence, motion, type PanInfo } from "framer-motion";
+import { useEffect, useState } from "react";
 
 type Props = {
   snippets: string[];
@@ -115,7 +115,7 @@ export default function TextSnippetCarousel({ snippets }: Props) {
           )}
 
           <Box sx={{ display: "flex", flex: 1, minWidth: 0, gap: 1 }}>
-            {snippets.length > 1 && (
+            {isDesktop && snippets.length > 1 && (
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={activeIndex}
@@ -127,13 +127,12 @@ export default function TextSnippetCarousel({ snippets }: Props) {
                   <Card
                     variant="outlined"
                     sx={{
-                      display: { xs: "none", md: "block" },
                       p: 0.9,
                       borderRadius: 1.5,
                       filter: "saturate(0.7)",
                       pointerEvents: "none",
                       width: 50,
-                      height:90,
+                      height: 90,
                       maskImage: `linear-gradient(to right, transparent, black)`,
                       WebkitMaskImage: `linear-gradient(to right, transparent, black)`,
                     }}
@@ -159,7 +158,7 @@ export default function TextSnippetCarousel({ snippets }: Props) {
                   transition={{ duration: 0.25 }}
                   drag={!isDesktop && snippets.length > 1 ? "x" : false}
                   dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.18}
+                  dragElastic={0.25}
                   onDragEnd={handleSwipeEnd}
                   style={{
                     position: "absolute",
@@ -172,7 +171,7 @@ export default function TextSnippetCarousel({ snippets }: Props) {
                     variant="outlined"
                     sx={{
                       width: "100%",
-                      height:90,
+                      height: 90,
                       p: { xs: 0.75, md: 1 },
                       borderRadius: 1.5,
                       display: "flex",
@@ -199,8 +198,8 @@ export default function TextSnippetCarousel({ snippets }: Props) {
                 </motion.div>
               </AnimatePresence>
             </Box>
-            {snippets.length > 1 && (
-             <AnimatePresence mode="wait" initial={false}>
+            {isDesktop && snippets.length > 1 && (
+              <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={activeIndex}
                   initial={{ opacity: 0 }}
@@ -211,13 +210,12 @@ export default function TextSnippetCarousel({ snippets }: Props) {
                   <Card
                     variant="outlined"
                     sx={{
-                      display: { xs: "none", md: "block" },
                       p: 0.9,
                       borderRadius: 1.5,
                       filter: "saturate(0.7)",
                       pointerEvents: "none",
                       width: 50,
-                      height:90,
+                      height: 90,
                       maskImage: `linear-gradient(to left, transparent, black)`,
                       WebkitMaskImage: `linear-gradient(to left, transparent, black)`,
                     }}
