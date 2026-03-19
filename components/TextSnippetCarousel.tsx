@@ -188,7 +188,7 @@ export default function TextSnippetCarousel({ snippets }: Props) {
                         overflow: "hidden",
                         WebkitLineClamp: { xs: 5, md: 2 },
                         WebkitBoxOrient: "vertical",
-                        p: 1,
+                        py: 1,
                       }}
                     >
                       {currentSnippet}
