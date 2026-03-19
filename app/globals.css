@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-sans: "Inter", var(--font-geist-sans), system-ui, sans-serif;
+  --font-sans: var(--font-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), "JetBrains Mono", monospace;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

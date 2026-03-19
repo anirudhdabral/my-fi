@@ -180,16 +180,13 @@ export default function TextSnippetCarousel({ snippets }: Props) {
                     }}
                   >
                     <Typography
-                      variant="body2"
+                      variant="inherit"
                       sx={{
                         textAlign: "center",
-                        fontWeight: 600,
-                        lineHeight: 1.5,
                         display: "-webkit-box",
                         overflow: "hidden",
-                        WebkitLineClamp: 2,
+                        WebkitLineClamp: { xs: 3, md: 2 },
                         WebkitBoxOrient: "vertical",
-                        px: 1,
                       }}
                     >
                       {currentSnippet}

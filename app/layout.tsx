@@ -1,19 +1,17 @@
 import Navbar from "@/components/Navbar";
 import Box from "@mui/material/Box";
 import type { Metadata, Viewport } from "next";
-import { Inter, Geist } from "next/font/google";
+import { Roboto } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
 import Providers from "./providers";
 import InstallPWA from "@/components/InstallPWA";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
-
-const inter = Inter({
-  variable: "--font-inter",
+const roboto = Roboto({
+  variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "700", "900"],
   display: "swap",
   preload: true,
 });
@@ -77,9 +75,9 @@ export default async function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(themeMode, "font-sans", geist.variable)}
+      className={cn(themeMode, "font-sans", roboto.variable)}
     >
-      <body className={inter.variable}>
+      <body>
         <Providers initialTheme={themeMode}>
           <Box
             sx={{
