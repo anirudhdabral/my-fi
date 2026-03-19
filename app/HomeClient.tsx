@@ -1,5 +1,18 @@
 "use client";
 
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import HourglassEmptyRoundedIcon from "@mui/icons-material/HourglassEmptyRounded";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import Paper from "@mui/material/Paper";
+import Skeleton from "@mui/material/Skeleton";
+import Stack from "@mui/material/Stack";
+import { alpha } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
+import { motion } from "framer-motion";
+import { signIn, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 const InvestmentCalculator = dynamic(
   () => import("@/components/InvestmentCalculator"),
@@ -22,19 +35,6 @@ const InvestmentCalculator = dynamic(
     ),
   },
 );
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import Paper from "@mui/material/Paper";
-import Skeleton from "@mui/material/Skeleton";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-import { motion } from "framer-motion";
-import { signIn, useSession } from "next-auth/react";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import HourglassEmptyRoundedIcon from "@mui/icons-material/HourglassEmptyRounded";
-import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
-import { alpha } from "@mui/material/styles";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -82,7 +82,7 @@ export default function HomeClient({
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: { xs: 5, md: 8 } }}>
+    <Container maxWidth="md" sx={{ py: 3 }}>
       {/* Hero Section — only for unauthenticated users */}
       {!session && (
         <motion.div
