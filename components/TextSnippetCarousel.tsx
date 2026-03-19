@@ -183,10 +183,12 @@ export default function TextSnippetCarousel({ snippets }: Props) {
                       variant="inherit"
                       sx={{
                         textAlign: "center",
+                        lineHeight: 1.2,
                         display: "-webkit-box",
                         overflow: "hidden",
                         WebkitLineClamp: { xs: 5, md: 2 },
                         WebkitBoxOrient: "vertical",
+                        p: 1,
                       }}
                     >
                       {currentSnippet}
