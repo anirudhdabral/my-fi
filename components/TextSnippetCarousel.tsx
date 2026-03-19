@@ -185,7 +185,7 @@ export default function TextSnippetCarousel({ snippets }: Props) {
                         textAlign: "center",
                         display: "-webkit-box",
                         overflow: "hidden",
-                        WebkitLineClamp: { xs: 3, md: 2 },
+                        WebkitLineClamp: { xs: 5, md: 2 },
                         WebkitBoxOrient: "vertical",
                       }}
                     >
