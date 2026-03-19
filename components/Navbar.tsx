@@ -22,7 +22,6 @@ import Typography from "@mui/material/Typography";
 import { alpha } from "@mui/material/styles";
 import { signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -37,9 +36,6 @@ export default function Navbar() {
   const isAdmin = session?.user?.role === "admin";
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    if (isAdmin) {
-      router.prefetch("/admin");
-    }
     setAnchorEl(event.currentTarget);
   };
 
@@ -93,28 +89,29 @@ export default function Navbar() {
             alignItems: "center",
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={0.75}>
-            <Image
-              src="/favicon-32x32.png"
-              alt="MyFi"
-              width={20}
-              height={20}
-              style={{ borderRadius: 4 }}
-              unoptimized
-              priority
-            />
-            <Typography
-              variant="subtitle2"
-              sx={{
-                fontWeight: 700,
-                color: "text.primary",
-                letterSpacing: "-0.02em",
-                fontSize: "0.875rem",
-              }}
-            >
-              MyFi
-            </Typography>
-          </Stack>
+          <Link href="/" style={{ textDecoration: "none" }}>
+            <Stack direction="row" alignItems="center" spacing={0.75}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/favicon.ico"
+                alt="MyFi"
+                width={20}
+                height={20}
+                style={{ borderRadius: 4 }}
+              />
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 700,
+                  color: "text.primary",
+                  letterSpacing: "-0.02em",
+                  fontSize: "0.875rem",
+                }}
+              >
+                MyFi
+              </Typography>
+            </Stack>
+          </Link>
 
           <Stack direction="row" spacing={0.5} alignItems="center">
             {!session && <ThemeToggle />}

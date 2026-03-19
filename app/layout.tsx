@@ -8,7 +8,7 @@ import Providers from "./providers";
 import InstallPWA from "@/components/InstallPWA";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const inter = Inter({
   variable: "--font-inter",
@@ -29,14 +29,8 @@ export const metadata: Metadata = {
     title: "MyFi",
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-    ],
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
+    icon: [{ url: "/favicon.ico", sizes: "any" }],
+    apple: [{ url: "/favicon.ico", sizes: "any" }],
   },
 };
 
@@ -74,7 +68,11 @@ export default async function RootLayout({
     | "dark";
 
   return (
-    <html lang="en" suppressHydrationWarning className={cn(themeMode, "font-sans", geist.variable)}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={cn(themeMode, "font-sans", geist.variable)}
+    >
       <body className={inter.variable}>
         <Providers initialTheme={themeMode}>
           <Box
