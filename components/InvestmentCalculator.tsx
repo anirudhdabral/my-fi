@@ -214,10 +214,11 @@ export default function InvestmentCalculator({
     fetch("/api/snippets")
       .then((res) => res.json())
       .then((payload) => {
-        const textSnippets =
+        const textSnippets = (
           payload?.snippets
             ?.map((snippet: CarouselSnippet) => snippet.text?.trim())
-            .filter(Boolean) ?? [];
+            .filter(Boolean) ?? []
+        ).sort(() => Math.random() - 0.5);
         setSnippets(textSnippets);
       })
       .catch(() => setSnippets([]));
