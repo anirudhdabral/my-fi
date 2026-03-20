@@ -2,8 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Campaign as CampaignIcon,
   ArrowBack as ArrowBackIcon,
+  Campaign as CampaignIcon,
   People as PeopleIcon,
   Settings as SettingsIcon,
 } from "@mui/icons-material";
@@ -341,6 +341,9 @@ export default function AdminClient() {
         <Tabs
           value={activeTab}
           onChange={(_, val) => setActiveTab(val)}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             "& .MuiTab-root": {
               minHeight: 52,

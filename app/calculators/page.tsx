@@ -234,6 +234,9 @@ export default function CalculatorsPage() {
         <Tabs
           value={tab}
           onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           sx={{
             "& .MuiTab-root": {
               minHeight: 48,
