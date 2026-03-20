@@ -22,6 +22,8 @@ import React, { useMemo, useState } from "react";
 // ── constants ────────────────────────────────────────────────────────
 const MIN_AMOUNT = 1_000;
 const MAX_AMOUNT = 10_00_000; // 10 lakh
+const MIN_CURRENT_PORTFOLIO_VAL = 1_000;
+const MAX_CURRENT_PORTFOLIO_VAL = 1_00_00_000; // 1 crore
 const MIN_RATE = 1;
 const MAX_RATE = 30;
 const MIN_YEARS = 1;
@@ -29,9 +31,10 @@ const MAX_YEARS = 40;
 
 const blockKeys = ["e", "E", "+", "-"];
 
-type CalcType = "sip" | "lumpsum" | "fd";
+type CalcType = "sip" | "lumpsum" | "fd" | "portfolioGrowth";
 
 const tabMeta: { key: CalcType; label: string }[] = [
+  { key: "portfolioGrowth", label: "Projected Growth" },
   { key: "sip", label: "SIP" },
   { key: "lumpsum", label: "Lumpsum" },
   { key: "fd", label: "FD" },
@@ -62,6 +65,21 @@ function calcFD(principal: number, annualRate: number, years: number) {
   return { invested: principal, futureValue, gains: futureValue - principal };
 }
 
+function calcPortfolioGrowth(
+  currentPortfolio: number,
+  monthly: number,
+  annualRate: number,
+  years: number,
+) {
+  const sipResult = calcSIP(monthly, annualRate, years);
+  const lumpsumResult = calcLumpsum(currentPortfolio, annualRate, years);
+  return {
+    invested: sipResult.invested + currentPortfolio,
+    futureValue: sipResult.futureValue + lumpsumResult.futureValue,
+    gains: sipResult.gains + lumpsumResult.gains,
+  };
+}
+
 // ── currency formatter ───────────────────────────────────────────────
 function fmt(n: number) {
   return n.toLocaleString("en-IN", {
@@ -78,6 +96,8 @@ export default function CalculatorsPage() {
   const activeType = tabMeta[tab].key;
 
   const [amount, setAmount] = useState<string>("10000");
+  const [currentPortfolioVal, setCurrentPortfolioVal] =
+    useState<string>("10000");
   const [rate, setRate] = useState<string>("12");
   const [years, setYears] = useState<string>("10");
 
@@ -85,6 +105,7 @@ export default function CalculatorsPage() {
   const amountNum = Number(amount) || 0;
   const rateNum = Number(rate) || 0;
   const yearsNum = Number(years) || 0;
+  const currentPortfolioValNum = Number(currentPortfolioVal) || 0;
 
   const amountError = useMemo(() => {
     if (!amount) return "";
@@ -94,6 +115,18 @@ export default function CalculatorsPage() {
       return `Max ₹${MAX_AMOUNT.toLocaleString("en-IN")}`;
     return "";
   }, [amount, amountNum]);
+
+  const currentPortfolioValError = useMemo(() => {
+    if (!currentPortfolioVal) return "";
+    if (
+      isNaN(currentPortfolioValNum) ||
+      currentPortfolioValNum < MIN_CURRENT_PORTFOLIO_VAL
+    )
+      return `Min ₹${MIN_CURRENT_PORTFOLIO_VAL.toLocaleString("en-IN")}`;
+    if (currentPortfolioValNum > MAX_CURRENT_PORTFOLIO_VAL)
+      return `Max ₹${MAX_CURRENT_PORTFOLIO_VAL.toLocaleString("en-IN")}`;
+    return "";
+  }, [currentPortfolioVal, currentPortfolioValNum]);
 
   const rateError = useMemo(() => {
     if (!rate) return "";
@@ -111,11 +144,13 @@ export default function CalculatorsPage() {
 
   const isValid =
     amount !== "" &&
+    currentPortfolioVal !== "" &&
     rate !== "" &&
     years !== "" &&
     !amountError &&
     !rateError &&
-    !yearsError;
+    !yearsError &&
+    !currentPortfolioValError;
 
   const showResult = isValid;
 
@@ -129,15 +164,30 @@ export default function CalculatorsPage() {
         return calcLumpsum(amountNum, rateNum, yearsNum);
       case "fd":
         return calcFD(amountNum, rateNum, yearsNum);
+      case "portfolioGrowth":
+        return calcPortfolioGrowth(
+          currentPortfolioValNum,
+          amountNum,
+          rateNum,
+          yearsNum,
+        );
     }
-  }, [isValid, activeType, amountNum, rateNum, yearsNum]);
+  }, [
+    isValid,
+    activeType,
+    amountNum,
+    rateNum,
+    yearsNum,
+    currentPortfolioValNum,
+  ]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
   };
 
-  const amountLabel =
-    activeType === "sip" ? "Monthly Investment" : "Investment Amount";
+  const amountLabel = ["sip", "portfolioGrowth"].includes(activeType)
+    ? "Monthly Investment"
+    : "Investment Amount";
 
   // ── invested vs gains ratio for bar ─────────────────────────────────
   const investedPct =
@@ -213,6 +263,84 @@ export default function CalculatorsPage() {
         >
           <Paper sx={{ p: { xs: 3, md: 4 }, mb: 3 }}>
             <Stack spacing={3}>
+              {activeType === "portfolioGrowth" && (
+                <Box>
+                  <Box
+                    display={"flex"}
+                    alignItems={"center"}
+                    justifyContent={"space-between"}
+                  >
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      gutterBottom
+                      sx={{ display: "block", mb: 1, fontWeight: 500 }}
+                    >
+                      Current portfolio value
+                    </Typography>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <TextField
+                        className="no-spinners"
+                        sx={{ width: 110 }}
+                        type="number"
+                        size="small"
+                        value={currentPortfolioVal}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const val = e.target.value;
+                          if (val === "") {
+                            setCurrentPortfolioVal("");
+                            return;
+                          }
+                          const num = Number(val);
+                          if (num > MAX_CURRENT_PORTFOLIO_VAL) {
+                            setCurrentPortfolioVal(
+                              MAX_CURRENT_PORTFOLIO_VAL.toString(),
+                            );
+                          } else {
+                            setCurrentPortfolioVal(val);
+                          }
+                        }}
+                        onBlur={() => {
+                          const num = Number(currentPortfolioVal);
+                          if (
+                            !currentPortfolioVal ||
+                            num < MIN_CURRENT_PORTFOLIO_VAL
+                          ) {
+                            setCurrentPortfolioVal(
+                              MIN_CURRENT_PORTFOLIO_VAL.toString(),
+                            );
+                          }
+                        }}
+                        onKeyDown={(e: React.KeyboardEvent) => {
+                          if (blockKeys.includes(e.key)) e.preventDefault();
+                        }}
+                        inputProps={{
+                          min: MIN_CURRENT_PORTFOLIO_VAL,
+                          max: MAX_CURRENT_PORTFOLIO_VAL,
+                        }}
+                        error={Boolean(currentPortfolioValError)}
+                        helperText={currentPortfolioValError}
+                        placeholder={"e.g. 100000"}
+                      />
+                    </Stack>
+                  </Box>
+                  <Slider
+                    value={
+                      currentPortfolioValNum >= MIN_CURRENT_PORTFOLIO_VAL &&
+                      currentPortfolioValNum <= MAX_CURRENT_PORTFOLIO_VAL
+                        ? currentPortfolioValNum
+                        : MIN_CURRENT_PORTFOLIO_VAL
+                    }
+                    min={MIN_CURRENT_PORTFOLIO_VAL}
+                    max={MAX_CURRENT_PORTFOLIO_VAL}
+                    step={500}
+                    onChange={(_, val) =>
+                      setCurrentPortfolioVal(val.toString())
+                    }
+                    sx={{ mt: 1 }}
+                  />
+                </Box>
+              )}
               <Box>
                 <Box
                   display={"flex"}
