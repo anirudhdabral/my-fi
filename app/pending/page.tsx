@@ -1,20 +1,24 @@
 "use client";
 
+import HourglassEmptyRoundedIcon from "@mui/icons-material/HourglassEmptyRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
+import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import HourglassEmptyRoundedIcon from "@mui/icons-material/HourglassEmptyRounded";
 import { motion } from "framer-motion";
-import { useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+
 import LoadingScreen from "@/app/loading";
 
 export default function PendingPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const limitReached = searchParams.get("limitReached") === "1";
 
   useEffect(() => {
     if (status === "authenticated" && session?.user?.approved) {
@@ -50,23 +54,46 @@ export default function PendingPage() {
           <HourglassEmptyRoundedIcon
             sx={{
               fontSize: 44,
-              color: "text.secondary",
+              color: limitReached ? "error.main" : "text.secondary",
               mb: 2,
-              opacity: 0.4,
+              opacity: 0.5,
             }}
           />
           <Typography variant="h5" fontWeight={700} sx={{ mb: 1.5 }}>
-            Access Pending
+            {limitReached ? "Pending Queue Full" : "Access Pending"}
           </Typography>
           <Typography
             color="text.secondary"
             variant="body2"
-            sx={{ mb: 3, maxWidth: 340, mx: "auto", lineHeight: 1.7 }}
+            sx={{ mb: 3, maxWidth: 380, mx: "auto", lineHeight: 1.7 }}
           >
-            Your account is awaiting admin approval. You&apos;ll receive an
-            email once access is granted.
+            {limitReached
+              ? "This account is not already approved or pending, and there are already 3 accounts waiting for approval. Sign out and use another account, or try again later."
+              : "Your account is awaiting admin approval. You'll receive an email once access is granted."}
           </Typography>
-          {status === "authenticated" ? (
+          {limitReached && status === "authenticated" ? (
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1.5}
+              justifyContent="center"
+            >
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+              >
+                Log out
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() =>
+                  signIn("google", { callbackUrl: "/" }, { prompt: "select_account" })
+                }
+              >
+                Use another account
+              </Button>
+            </Stack>
+          ) : status === "authenticated" ? (
             <Button component={Link} href="/" variant="outlined" size="small">
               Go to home
             </Button>

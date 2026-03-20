@@ -37,15 +37,21 @@ export const authOptions: NextAuthOptions = {
         ? normalizedEmail === adminEmail.trim()
         : false;
       const existing = await UserModel.findOne({ email: normalizedEmail });
+      const isExistingUser = Boolean(existing);
 
-      if (!isAdmin && !existing) {
+      if (!isAdmin && !isExistingUser) {
         const pendingUsersCount = await UserModel.countDocuments({
           approved: false,
           role: "user",
         });
 
         if (pendingUsersCount >= 3) {
-          return "/auth/signin?error=PendingLimitReached";
+          user.id = "";
+          user.role = "user";
+          user.approved = false;
+          user.pendingLimitReached = true;
+          user.isExistingUser = false;
+          return true;
         }
       }
 
@@ -58,6 +64,9 @@ export const authOptions: NextAuthOptions = {
         },
         { upsert: true, new: true },
       );
+
+      user.pendingLimitReached = false;
+      user.isExistingUser = isExistingUser;
 
       return true;
     },
@@ -73,6 +82,14 @@ export const authOptions: NextAuthOptions = {
           token.role = dbUser.role;
           token.approved = dbUser.approved;
           token.id = dbUser._id.toString();
+          token.pendingLimitReached = false;
+          token.isExistingUser = true;
+        } else if (user?.pendingLimitReached) {
+          token.role = "user";
+          token.approved = false;
+          token.id = "";
+          token.pendingLimitReached = true;
+          token.isExistingUser = false;
         }
       }
       return token;
@@ -85,6 +102,8 @@ export const authOptions: NextAuthOptions = {
           id: token.id,
           role: (token.role ?? "user") as UserRole,
           approved: Boolean(token.approved),
+          pendingLimitReached: Boolean(token.pendingLimitReached),
+          isExistingUser: Boolean(token.isExistingUser),
         },
       };
     },

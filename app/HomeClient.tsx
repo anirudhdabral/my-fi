@@ -12,8 +12,9 @@ import Stack from "@mui/material/Stack";
 import { alpha } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+
 const InvestmentCalculator = dynamic(
   () => import("@/components/InvestmentCalculator"),
   {
@@ -83,7 +84,6 @@ export default function HomeClient({
 
   return (
     <Container maxWidth="md" sx={{ py: 3 }}>
-      {/* Hero Section — only for unauthenticated users */}
       {!session && (
         <motion.div
           variants={containerVariants}
@@ -98,7 +98,6 @@ export default function HomeClient({
               position: "relative",
             }}
           >
-            {/* Decorative gradient orb — primary */}
             <Box
               sx={{
                 position: "absolute",
@@ -115,7 +114,6 @@ export default function HomeClient({
                 zIndex: 0,
               }}
             />
-            {/* Decorative gradient orb — secondary */}
             <Box
               sx={{
                 position: "absolute",
@@ -242,7 +240,6 @@ export default function HomeClient({
         </motion.div>
       )}
 
-      {/* Main Content */}
       {session && (
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -251,6 +248,63 @@ export default function HomeClient({
         >
           {session.user?.approved ? (
             <InvestmentCalculator initialMetadata={initialMetadata} />
+          ) : session.user?.pendingLimitReached ? (
+            <Paper
+              sx={{
+                p: { xs: 4, md: 5 },
+                textAlign: "center",
+                border: (theme) =>
+                  `1px solid ${
+                    theme.palette.mode === "dark"
+                      ? "rgba(239,68,68,0.18)"
+                      : "rgba(220,38,38,0.12)"
+                  }`,
+                background: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "rgba(239,68,68,0.05)"
+                    : "rgba(220,38,38,0.03)",
+              }}
+            >
+              <HourglassEmptyRoundedIcon
+                sx={{
+                  fontSize: 36,
+                  color: "error.main",
+                  mb: 2,
+                  opacity: 0.7,
+                }}
+              />
+              <Typography variant="h6" fontWeight={700} sx={{ mb: 1 }}>
+                Pending Queue Full
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ maxWidth: 420, mx: "auto", mb: 3, lineHeight: 1.7 }}
+              >
+                This account is not already on the approved or pending list, and
+                there are already 3 accounts waiting for approval. Sign out and
+                use another account, or try this one again after a slot opens.
+              </Typography>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={1.5}
+                justifyContent="center"
+              >
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+                >
+                  Log out
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => signIn("google", { callbackUrl: "/" }, { prompt: "select_account" })}
+                >
+                  Use another account
+                </Button>
+              </Stack>
+            </Paper>
           ) : (
             <Paper
               sx={{

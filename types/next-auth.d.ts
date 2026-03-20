@@ -7,6 +7,8 @@ declare module "next-auth" {
       id: string;
       role: UserRole;
       approved: boolean;
+      pendingLimitReached: boolean;
+      isExistingUser: boolean;
     } & DefaultSession["user"];
   }
 
@@ -14,6 +16,8 @@ declare module "next-auth" {
     id: string;
     role: UserRole;
     approved: boolean;
+    pendingLimitReached?: boolean;
+    isExistingUser?: boolean;
   }
 }
 
@@ -22,5 +26,7 @@ declare module "next-auth/jwt" {
     id: string;
     role: UserRole;
     approved: boolean;
+    pendingLimitReached?: boolean;
+    isExistingUser?: boolean;
   }
 }
