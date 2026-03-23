@@ -2,7 +2,6 @@
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
@@ -548,169 +547,182 @@ export default function CalculatorsPage() {
               transition={{ duration: 0.35 }}
             >
               <Paper sx={{ p: { xs: 3, md: 4 } }}>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  sx={{ mb: 2.5 }}
-                >
-                  <Typography
-                    variant="subtitle2"
-                    color="text.secondary"
-                    sx={{
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                      fontSize: "0.7rem",
-                    }}
-                  >
-                    {activeType === "sip"
-                      ? "SIP Returns"
-                      : activeType === "lumpsum"
-                        ? "Lumpsum Returns"
-                        : "FD Maturity"}
-                  </Typography>
-                  {activeType === "sip" && (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: "primary.main",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 0.5,
-                        fontWeight: 600,
-                        cursor: "default",
-                        fontSize: "0.68rem",
-                      }}
-                    >
-                      <TrendingUpRoundedIcon sx={{ fontSize: 13 }} />
-                      Annuity Due
-                    </Typography>
-                  )}
-                </Stack>
-
-                <Grid container spacing={2} sx={{ mb: 3 }}>
-                  <Grid size={{ xs: 4 }}>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: "block", mb: 0.5, fontSize: "0.68rem" }}
-                    >
-                      Invested
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      fontWeight={700}
-                      sx={{ fontFamily: "var(--font-mono), monospace" }}
-                    >
-                      {fmt(result.invested)}
-                    </Typography>
-                  </Grid>
-                  <Grid size={{ xs: 4 }}>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: "block", mb: 0.5, fontSize: "0.68rem" }}
-                    >
-                      Gains
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      fontWeight={700}
-                      sx={{
-                        fontFamily: "var(--font-mono), monospace",
-                        color: (theme: any) =>
-                          theme.palette.mode === "dark" ? "#34d399" : "#059669",
-                      }}
-                    >
-                      {fmt(result.gains)}
-                    </Typography>
-                  </Grid>
-                  <Grid size={{ xs: 4 }}>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: "block", mb: 0.5, fontSize: "0.68rem" }}
-                    >
-                      Total
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      fontWeight={700}
-                      sx={{ fontFamily: "var(--font-mono), monospace" }}
-                    >
-                      {fmt(result.futureValue)}
-                    </Typography>
-                  </Grid>
-                </Grid>
-
-                {/* Visual ratio bar */}
                 <Box
-                  sx={{
-                    width: "100%",
-                    height: 5,
-                    borderRadius: 1,
-                    overflow: "hidden",
-                    display: "flex",
-                    bgcolor: (theme) => alpha(theme.palette.divider, 0.06),
-                  }}
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
                 >
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${investedPct}%` }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                    style={{
-                      height: "100%",
-                      background: "linear-gradient(90deg, #7c3aed, #a78bfa)",
-                      borderRadius: "4px 0 0 4px",
-                    }}
-                  />
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${100 - investedPct}%` }}
-                    transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-                    style={{
-                      height: "100%",
-                      background: "linear-gradient(90deg, #059669, #34d399)",
-                      borderRadius: "0 4px 4px 0",
-                    }}
-                  />
+                  <Stack sx={{ gap: 2, mb: 3, alignItems: "space-between" }}>
+                    <Grid size={{ xs: 4 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: "block", mb: 0.5, fontSize: "0.68rem" }}
+                      >
+                        Invested amount
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        fontWeight={700}
+                        sx={{ fontFamily: "var(--font-mono), monospace" }}
+                      >
+                        {fmt(result.invested)}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 4 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: "block", mb: 0.5, fontSize: "0.68rem" }}
+                      >
+                        Est. returns
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        fontWeight={700}
+                        sx={{
+                          fontFamily: "var(--font-mono), monospace",
+                          color: (theme: any) =>
+                            theme.palette.mode === "dark"
+                              ? "#34d399"
+                              : "#059669",
+                        }}
+                      >
+                        {fmt(result.gains)}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 4 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: "block", mb: 0.5, fontSize: "0.68rem" }}
+                      >
+                        Total value
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        fontWeight={700}
+                        sx={{ fontFamily: "var(--font-mono), monospace" }}
+                      >
+                        {fmt(result.futureValue)}
+                      </Typography>
+                    </Grid>
+                  </Stack>
+                  <Stack>
+                    {/* Donut Chart */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Box position="relative" width={190} height={190}>
+                        <svg
+                          width="100%"
+                          height="100%"
+                          viewBox="0 0 190 190"
+                          style={{
+                            transform: "rotate(-90deg) scaleY(-1)",
+                            overflow: "visible",
+                          }}
+                        >
+                          <Box
+                            component="circle"
+                            cx="95"
+                            cy="95"
+                            r="75"
+                            fill="none"
+                            sx={{
+                              stroke: (theme) =>
+                                alpha(theme.palette.divider, 0.08),
+                              strokeWidth: 35,
+                            }}
+                          />
+                          <motion.circle
+                            cx="95"
+                            cy="95"
+                            r="75"
+                            fill="none"
+                            stroke="#7c3aed"
+                            strokeWidth="35"
+                            initial={{ strokeDasharray: `0 471.24` }}
+                            animate={{
+                              strokeDasharray: `${(investedPct / 100) * 471.24} 471.24`,
+                            }}
+                            transition={{
+                              duration: 1,
+                              ease: "easeOut",
+                            }}
+                          />
+                          <motion.circle
+                            cx="95"
+                            cy="95"
+                            r="75"
+                            fill="none"
+                            stroke={"#34d399"}
+                            strokeWidth="35"
+                            initial={{
+                              strokeDasharray: `0 471.24`,
+                              strokeDashoffset: `-${(investedPct / 100) * 471.24}`,
+                            }}
+                            animate={{
+                              strokeDasharray: `${((100 - investedPct) / 100) * 471.24} 471.24`,
+                              strokeDashoffset: `-${(investedPct / 100) * 471.24}`,
+                            }}
+                            transition={{
+                              duration: 1,
+                              ease: "easeOut",
+                              delay: 0.2,
+                            }}
+                          />
+                        </svg>
+                      </Box>
+                    </Box>
+
+                    <Stack
+                      direction="row"
+                      spacing={3}
+                      justifyContent="center"
+                      sx={{ mt: 1, mb: 1 }}
+                    >
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Box
+                          sx={{
+                            width: 18,
+                            height: 10,
+                            borderRadius: 5,
+                            bgcolor: "#7c3aed",
+                          }}
+                        />
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ fontSize: "0.75rem", fontWeight: 500 }}
+                        >
+                          Invested amount
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Box
+                          sx={{
+                            width: 18,
+                            height: 10,
+                            borderRadius: 5,
+                            bgcolor: "#34d399",
+                          }}
+                        />
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ fontSize: "0.75rem", fontWeight: 500 }}
+                        >
+                          Est. returns
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </Stack>
                 </Box>
-                <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-                  <Stack direction="row" spacing={0.5} alignItems="center">
-                    <Box
-                      sx={{
-                        width: 7,
-                        height: 7,
-                        borderRadius: "2px",
-                        background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
-                      }}
-                    />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ fontSize: "0.68rem" }}
-                    >
-                      Invested
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={0.5} alignItems="center">
-                    <Box
-                      sx={{
-                        width: 7,
-                        height: 7,
-                        borderRadius: "2px",
-                        background: "linear-gradient(135deg, #059669, #34d399)",
-                      }}
-                    />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ fontSize: "0.68rem" }}
-                    >
-                      Gains
-                    </Typography>
-                  </Stack>
-                </Stack>
 
                 {/* Formula Section */}
                 {activeType === "sip" && (

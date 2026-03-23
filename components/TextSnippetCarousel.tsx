@@ -59,14 +59,14 @@ export default function TextSnippetCarousel({ snippets }: Props) {
   }, [snippets.length]);
 
   useEffect(() => {
-    if (isDesktop || snippets.length <= 1) return;
+    if (snippets.length <= 1) return;
 
     const timer = setInterval(() => {
       goNext();
     }, 5000);
 
     return () => clearInterval(timer);
-  }, [isDesktop, snippets.length, activeIndex]);
+  }, [snippets.length, activeIndex]);
 
   const goNext = () => {
     if (!snippets.length) return;
