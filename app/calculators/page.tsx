@@ -680,11 +680,15 @@ export default function CalculatorsPage() {
                       </Box>
                     </Box>
 
-                    <Stack
+                    
+                  </Stack>
+                  
+                </Box>
+<Stack
                       direction="row"
                       spacing={3}
-                      justifyContent="center"
-                      sx={{ mt: 1, mb: 1 }}
+                      justifyContent={{xs:"center", sm:"end"}}
+                      sx={{ mt: 3}}
                     >
                       <Stack direction="row" spacing={1} alignItems="center">
                         <Box
@@ -721,9 +725,6 @@ export default function CalculatorsPage() {
                         </Typography>
                       </Stack>
                     </Stack>
-                  </Stack>
-                </Box>
-
                 {/* Formula Section */}
                 {activeType === "sip" && (
                   <Box

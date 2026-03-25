@@ -1,14 +1,8 @@
 "use client";
 
-import {
-  CheckCircle as CheckCircleIcon,
-  Delete as DeleteIcon,
-  Info as InfoIcon,
-  Send as SendIcon,
-} from "@mui/icons-material";
+import { Delete as DeleteIcon, Send as SendIcon } from "@mui/icons-material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -130,7 +124,7 @@ export default function AdminUsersTab({
               variant="contained"
               color="secondary"
               size="small"
-              startIcon={<SendIcon sx={{ fontSize: "16px !important" }} />}
+              startIcon={<SendIcon sx={{ fontSize: "16px" }} />}
               onClick={handleRebalance}
             >
               Broadcast
@@ -173,79 +167,67 @@ export default function AdminUsersTab({
                       {user.email}
                     </Typography>
                   </Box>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Chip
-                      label={user.approved ? "Approved" : "Pending"}
-                      color={user.approved ? "success" : "warning"}
-                      size="small"
-                      variant="outlined"
-                      icon={user.approved ? <CheckCircleIcon /> : <InfoIcon />}
-                      sx={{ fontWeight: 600, mr: 1 }}
-                    />
-                    <Stack direction="row" spacing={1}>
-                      {user.approved ? (
+                  <Stack direction="row" spacing={1}>
+                    {user.approved ? (
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        color="error"
+                        onClick={() =>
+                          handleOpenConfirm(
+                            "revoke",
+                            user._id,
+                            user.name || user.email,
+                          )
+                        }
+                        sx={{ minWidth: 90, fontSize: "0.75rem", p: 0.5 }}
+                      >
+                        Revoke
+                      </Button>
+                    ) : (
+                      <>
                         <Button
-                          variant="outlined"
+                          variant="contained"
                           size="small"
-                          color="error"
+                          color="primary"
                           onClick={() =>
                             handleOpenConfirm(
-                              "revoke",
+                              "approve",
                               user._id,
                               user.name || user.email,
                             )
                           }
-                          sx={{ minWidth: 90, fontSize: "0.75rem" }}
+                          sx={{ minWidth: 90, fontSize: "0.75rem", p: 0.5 }}
                         >
-                          Revoke
+                          Approve
                         </Button>
-                      ) : (
-                        <>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            color="primary"
-                            onClick={() =>
-                              handleOpenConfirm(
-                                "approve",
-                                user._id,
-                                user.name || user.email,
-                              )
-                            }
-                            sx={{ minWidth: 90, fontSize: "0.75rem" }}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            color="error"
-                            startIcon={
-                              <DeleteIcon
-                                sx={{ fontSize: "14px !important" }}
-                              />
-                            }
-                            onClick={() =>
-                              handleOpenConfirm(
-                                "delete",
-                                user._id,
-                                user.name || user.email,
-                              )
-                            }
-                            sx={{ minWidth: 90, fontSize: "0.75rem" }}
-                          >
-                            Reject
-                          </Button>
-                        </>
-                      )}
-                    </Stack>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          color="error"
+                          startIcon={
+                            <DeleteIcon sx={{ fontSize: "14px !important" }} />
+                          }
+                          onClick={() =>
+                            handleOpenConfirm(
+                              "delete",
+                              user._id,
+                              user.name || user.email,
+                            )
+                          }
+                          sx={{ minWidth: 90, fontSize: "0.75rem", p: 0.5 }}
+                        >
+                          Reject
+                        </Button>
+                      </>
+                    )}
                   </Stack>
                 </Box>
               ))
             ) : (
               <Box sx={{ py: 5, textAlign: "center" }}>
                 <Typography variant="body2" color="text.secondary">
-                  No users found.
+                  No {showOnlyPending ? "pending" : ""} users found.
                 </Typography>
               </Box>
             )}
