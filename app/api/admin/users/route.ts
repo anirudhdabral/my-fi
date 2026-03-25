@@ -56,3 +56,32 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: (error as Error).message }, { status });
   }
 }
+export async function DELETE(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+
+    if (!userId) {
+      throw new Error("User ID is required");
+    }
+
+    await requireAdmin(req);
+    await connectMongo();
+
+    const deletedUser = await UserModel.findByIdAndDelete(userId).lean();
+
+    if (!deletedUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      message: "User removed successfully",
+      userId,
+    });
+  } catch (error) {
+    const status = (error as Error).message.includes("Unauthorized")
+      ? 401
+      : 400;
+    return NextResponse.json({ error: (error as Error).message }, { status });
+  }
+}

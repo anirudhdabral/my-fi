@@ -2,12 +2,18 @@
 
 import {
   CheckCircle as CheckCircleIcon,
+  Delete as DeleteIcon,
   Info as InfoIcon,
   Send as SendIcon,
 } from "@mui/icons-material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
@@ -15,6 +21,7 @@ import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 import type { AdminUser } from "../types";
 
@@ -29,6 +36,7 @@ type Props = {
     userId: string,
     payload: { approved?: boolean },
   ) => Promise<void>;
+  handleUserDelete: (userId: string) => Promise<void>;
 };
 
 export default function AdminUsersTab({
@@ -39,7 +47,42 @@ export default function AdminUsersTab({
   setShowOnlyPending,
   handleRebalance,
   handleUserUpdate,
+  handleUserDelete,
 }: Props) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<{
+    type: "approve" | "revoke" | "delete";
+    userId: string;
+    userName: string;
+  } | null>(null);
+
+  const handleOpenConfirm = (
+    type: "approve" | "revoke" | "delete",
+    userId: string,
+    userName: string,
+  ) => {
+    setConfirmAction({ type, userId, userName });
+    setConfirmOpen(true);
+  };
+
+  const handleCloseConfirm = () => {
+    setConfirmOpen(false);
+    setConfirmAction(null);
+  };
+
+  const handleConfirm = async () => {
+    if (!confirmAction) return;
+
+    if (confirmAction.type === "approve") {
+      await handleUserUpdate(confirmAction.userId, { approved: true });
+    } else if (confirmAction.type === "revoke") {
+      await handleUserUpdate(confirmAction.userId, { approved: false });
+    } else {
+      await handleUserDelete(confirmAction.userId);
+    }
+    handleCloseConfirm();
+  };
+
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
       <Paper sx={{ p: { xs: 3, md: 4 } }}>
@@ -137,21 +180,65 @@ export default function AdminUsersTab({
                       size="small"
                       variant="outlined"
                       icon={user.approved ? <CheckCircleIcon /> : <InfoIcon />}
-                      sx={{ fontWeight: 600 }}
+                      sx={{ fontWeight: 600, mr: 1 }}
                     />
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      color={user.approved ? "error" : "primary"}
-                      onClick={() =>
-                        handleUserUpdate(user._id, {
-                          approved: !user.approved,
-                        })
-                      }
-                      sx={{ minWidth: 100, fontSize: "0.75rem" }}
-                    >
-                      {user.approved ? "Revoke" : "Approve"}
-                    </Button>
+                    <Stack direction="row" spacing={1}>
+                      {user.approved ? (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          color="error"
+                          onClick={() =>
+                            handleOpenConfirm(
+                              "revoke",
+                              user._id,
+                              user.name || user.email,
+                            )
+                          }
+                          sx={{ minWidth: 90, fontSize: "0.75rem" }}
+                        >
+                          Revoke
+                        </Button>
+                      ) : (
+                        <>
+                          <Button
+                            variant="contained"
+                            size="small"
+                            color="primary"
+                            onClick={() =>
+                              handleOpenConfirm(
+                                "approve",
+                                user._id,
+                                user.name || user.email,
+                              )
+                            }
+                            sx={{ minWidth: 90, fontSize: "0.75rem" }}
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            color="error"
+                            startIcon={
+                              <DeleteIcon
+                                sx={{ fontSize: "14px !important" }}
+                              />
+                            }
+                            onClick={() =>
+                              handleOpenConfirm(
+                                "delete",
+                                user._id,
+                                user.name || user.email,
+                              )
+                            }
+                            sx={{ minWidth: 90, fontSize: "0.75rem" }}
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      )}
+                    </Stack>
                   </Stack>
                 </Box>
               ))
@@ -165,6 +252,58 @@ export default function AdminUsersTab({
           </Stack>
         </Stack>
       </Paper>
+
+      <Dialog
+        open={confirmOpen}
+        onClose={handleCloseConfirm}
+        PaperProps={{
+          sx: { borderRadius: 3, p: 1 },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700 }}>
+          {confirmAction?.type === "approve"
+            ? "Approve User?"
+            : confirmAction?.type === "revoke"
+              ? "Revoke Access?"
+              : "Remove User?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {confirmAction?.type === "approve" ? (
+              <>
+                Are you sure you want to approve <b>{confirmAction.userName}</b>
+                ? This will grant them immediate access to the application.
+              </>
+            ) : confirmAction?.type === "revoke" ? (
+              <>
+                Are you sure you want to revoke access for{" "}
+                <b>{confirmAction.userName}</b>? This will prevent them from
+                accessing the application until approved again.
+              </>
+            ) : (
+              <>
+                Are you sure you want to remove <b>{confirmAction?.userName}</b>
+                ? This action will delete their account data and cannot be
+                undone.
+              </>
+            )}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={handleCloseConfirm} sx={{ fontWeight: 600 }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            color={confirmAction?.type === "approve" ? "primary" : "error"}
+            variant="contained"
+            sx={{ borderRadius: 2, fontWeight: 600 }}
+            autoFocus
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </motion.div>
   );
 }

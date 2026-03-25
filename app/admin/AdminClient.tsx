@@ -228,6 +228,22 @@ export default function AdminClient() {
     }
   };
 
+  const handleUserDelete = async (userId: string) => {
+    try {
+      const res = await fetch(`/api/admin/users?userId=${userId}`, {
+        method: "DELETE",
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error ?? "Unable to remove user");
+      }
+      setUsers((prev) => prev.filter((user) => user._id !== userId));
+      showToast("User removed", "success");
+    } catch (error) {
+      showToast((error as Error).message, "error");
+    }
+  };
+
   const handleRebalance = async () => {
     try {
       const response = await fetch("/api/admin/rebalance", { method: "POST" });
@@ -398,6 +414,7 @@ export default function AdminClient() {
           setShowOnlyPending={setShowOnlyPending}
           handleRebalance={handleRebalance}
           handleUserUpdate={handleUserUpdate}
+          handleUserDelete={handleUserDelete}
         />
       )}
 
