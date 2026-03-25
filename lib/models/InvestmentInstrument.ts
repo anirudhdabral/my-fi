@@ -5,6 +5,7 @@ export interface InvestmentInstrumentDocument extends Document {
   categoryId: Types.ObjectId;
   inv_percentage: number;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 const investmentInstrumentSchema = new Schema<InvestmentInstrumentDocument>(
@@ -16,9 +17,8 @@ const investmentInstrumentSchema = new Schema<InvestmentInstrumentDocument>(
       ref: "InvestmentCategory",
     },
     inv_percentage: { type: Number, required: true, min: 0, max: 100 },
-    createdAt: { type: Date, default: () => new Date() },
   },
-  { timestamps: false },
+  { timestamps: true },
 );
 
 const InvestmentInstrument =

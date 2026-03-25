@@ -4,15 +4,15 @@ export interface InvestmentCategoryDocument extends Document {
   name: string;
   percentage: number;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 const investmentCategorySchema = new Schema<InvestmentCategoryDocument>(
   {
     name: { type: String, required: true },
     percentage: { type: Number, required: true, min: 0, max: 100 },
-    createdAt: { type: Date, default: () => new Date() },
   },
-  { timestamps: false },
+  { timestamps: true },
 );
 
 const InvestmentCategory =
