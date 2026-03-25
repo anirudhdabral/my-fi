@@ -552,7 +552,7 @@ export default function CalculatorsPage() {
                   justifyContent={"space-between"}
                   alignItems={"center"}
                 >
-                  <Stack sx={{ gap: 2, mb: 3, alignItems: "space-between" }}>
+                  <Stack sx={{ gap: 2, alignItems: "space-between" }}>
                     <Grid size={{ xs: 4 }}>
                       <Typography
                         variant="caption"
@@ -679,52 +679,49 @@ export default function CalculatorsPage() {
                         </svg>
                       </Box>
                     </Box>
-
-                    
                   </Stack>
-                  
                 </Box>
-<Stack
-                      direction="row"
-                      spacing={3}
-                      justifyContent={{xs:"center", sm:"end"}}
-                      sx={{ mt: 3}}
+                <Stack
+                  direction="row"
+                  spacing={3}
+                  justifyContent={{ xs: "center", sm: "end" }}
+                  sx={{ mt: 3 }}
+                >
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Box
+                      sx={{
+                        width: 18,
+                        height: 10,
+                        borderRadius: 5,
+                        bgcolor: "#7c3aed",
+                      }}
+                    />
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ fontSize: "0.75rem", fontWeight: 500 }}
                     >
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Box
-                          sx={{
-                            width: 18,
-                            height: 10,
-                            borderRadius: 5,
-                            bgcolor: "#7c3aed",
-                          }}
-                        />
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ fontSize: "0.75rem", fontWeight: 500 }}
-                        >
-                          Invested amount
-                        </Typography>
-                      </Stack>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Box
-                          sx={{
-                            width: 18,
-                            height: 10,
-                            borderRadius: 5,
-                            bgcolor: "#34d399",
-                          }}
-                        />
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ fontSize: "0.75rem", fontWeight: 500 }}
-                        >
-                          Est. returns
-                        </Typography>
-                      </Stack>
-                    </Stack>
+                      Invested amount
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Box
+                      sx={{
+                        width: 18,
+                        height: 10,
+                        borderRadius: 5,
+                        bgcolor: "#34d399",
+                      }}
+                    />
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ fontSize: "0.75rem", fontWeight: 500 }}
+                    >
+                      Est. returns
+                    </Typography>
+                  </Stack>
+                </Stack>
                 {/* Formula Section */}
                 {activeType === "sip" && (
                   <Box
