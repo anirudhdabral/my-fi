@@ -1,8 +1,8 @@
+import { requireAdmin } from "@/lib/auth/guards";
+import { UserModel } from "@/lib/models";
+import connectMongo from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import connectMongo from "@/lib/mongodb";
-import { UserModel } from "@/lib/models";
-import { requireAdmin } from "@/lib/auth/guards";
 
 const userUpdateSchema = z.object({
   userId: z.string().min(1),
