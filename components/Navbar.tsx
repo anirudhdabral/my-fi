@@ -93,7 +93,7 @@ export default function Navbar() {
             <Stack direction="row" alignItems="center" spacing={0.75}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/favicon.ico"
+                src="/favicon.svg"
                 alt="MyFi"
                 width={20}
                 height={20}

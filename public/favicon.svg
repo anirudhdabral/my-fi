@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#2d2d3e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="110" fill="url(#bg)"/>
+
+  <!--
+    4-slice pie chart.
+    Main centre (slices B, C, D):  (256, 256),  r = 145
+    Pulled slice A centre:          (281, 231)   — offset 35px toward 315°
+    This creates a ~35px gap at both junction points,
+    giving ~20px of clear air after accounting for stroke width.
+
+    Slice A  →  270° – 0°   (90°,  pulled OUT to upper-right)
+    Slice B  →  0°  – 130°  (130°)
+    Slice C  →  130° – 230° (100°)
+    Slice D  →  230° – 270° (40°,  small sliver)
+  -->
+
+  <!-- ── Slice B  (0° → 130°) ───────────────────── -->
+  <path d="M 256 256 L 401 256 A 145 145 0 0 1 163 367 Z"
+        fill="none" stroke="white" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- ── Slice C  (130° → 230°) ────────────────── -->
+  <path d="M 256 256 L 163 367 A 145 145 0 0 1 163 145 Z"
+        fill="none" stroke="white" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- ── Slice D  (230° → 270°, small sliver) ──── -->
+  <path d="M 256 256 L 163 145 A 145 145 0 0 1 256 111 Z"
+        fill="none" stroke="white" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- ── Slice A  (270° → 0°, PULLED OUT) ─────── -->
+  <!--    Centre offset +35px toward 315°: (281, 231)  -->
+  <path d="M 281 231 L 281 86 A 145 145 0 0 1 426 231 Z"
+        fill="none" stroke="white" stroke-width="14"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+</svg>
